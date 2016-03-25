@@ -132,10 +132,6 @@ levbdim=env.SharedLibrary("#lib/levbdim",LIBRARY_SOURCES)
 #MYLIBS=["levbdim",'pthread',  'm', 'stdc++',boostsystem,boostthread]
 #_levbdim=env.PythonModule('_Llevbdim', ['Llevbdim.i'],LIBPATH="#lib",LIBS=MYLIBS)
 
-myinc=[]
-for x in Glob("#include/*.h"):
-  myinc.append("include/"+x.name)
-print myinc
 #env.Install(DHCAL_ROOT+"/opt/dhcal/lib",levbdim)
 ###env.Install("/opt/dhcal/lib",levbdim)
 ###env.Install("/opt/dhcal/include/readout",myinc)
@@ -143,5 +139,9 @@ print myinc
 ###env.Alias('install', [DHCAL_ROOT+"/opt/dhcal/lib","/opt/dhcal/lib","/opt/dhcal/include/rpiccc"])
 #env.Alias('install', [DHCAL_ROOT+"/opt/dhcal/lib"])
 
-
+EXE_LIBPATH=LIBRARY_PATHS
+EXE_LIBPATH.append("#lib")
+EXE_LIBS=LIBRARIES
+EXE_LIBS.append("levbdim")
+dum=env.Program("bin/dummy",source="test/dummyServer.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
 

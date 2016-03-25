@@ -10,9 +10,9 @@ std::string fsmmessage::command()
 {
 	return _jsroot["command"].asString();
 }
-std::string fsmmessage::value() 
+std::string& fsmmessage::value() 
 {
-	return _jsroot.asString();
+	return _sroot;
 }
 Json::Value fsmmessage::content()
 {

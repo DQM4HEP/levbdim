@@ -14,7 +14,7 @@ namespace levbdim {
 
     fsmmessage(std::string s);
       
-    std::string value();
+    std::string& value();
     std::string command();
     Json::Value content();
     void setValue(std::string s);

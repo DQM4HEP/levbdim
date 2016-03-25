@@ -6,12 +6,21 @@ void rpcFsmMessage::rpcHandler()
   char msgi[1024];
   memset(msgi,0,1024);
   memcpy(msgi,getData(),getSize());
+  //printf("message %s \n",msgi);
    std::string smsg;smsg.assign(msgi);
+   
    levbdim::fsmmessage msg(smsg);
+
+    std::cout<<msg.value()<<std::endl;
+   std::cout<<msg.value().size()<<std::endl;
+   
    _server->processCommand(&msg);
-   memset(msgi,0,1024);
-   memcpy(msgi,msg.value().c_str(),msg.value().size());
-   setData((char*) msg.value().c_str(),msg.value().size()); 
+  
+   
+   // memset(msgi,0,1024);
+   // memcpy(msgi,msg.value().c_str(),msg.value().size());
+   setData((char*) msg.value().c_str(),msg.value().size());
+  
 } 
 fsm::fsm(std::string name) : _state("CREATED")
 {
@@ -51,14 +60,43 @@ std::string fsm::processCommand(levbdim::fsmmessage* msg)
   if (it==_transitions.end())
     {
       Json::Value jrep;
-      jrep["command"]=msg->command();
+      jrep["command"]="FAILED";
       std::stringstream s0;
       s0.str(std::string());  
       s0<<msg->command()<<" not found in transitions list ";
       jrep["content"]["msg"]=s0.str();
       Json::FastWriter fastWriter;
       msg->setValue(fastWriter.write(jrep));
+      return "ERROR";
     }
   else
-    it->second.callback()(msg);
+  {
+    if (it->second.initialState().compare(_state)!=0)
+      {
+        Json::Value jrep;
+      jrep["command"]="FAILED";
+      std::stringstream s0;
+      s0.str(std::string());  
+      s0<<_state<<" is not ok for command "<<msg->command();
+      jrep["content"]["msg"]=s0.str();
+      Json::FastWriter fastWriter;
+      msg->setValue(fastWriter.write(jrep));
+      return "ERROR";
+      }
+      else
+      {
+	it->second.callback()(msg);
+        _state=it->second.finalState();
+        this->publishState();
+	Json::Value jrep;
+	std::stringstream s0;
+	s0.str(std::string());  
+	s0<<msg->command()<<"_DONE";
+	jrep["command"]=s0.str();
+	jrep["content"]["msg"]="OK";
+	Json::FastWriter fastWriter;
+	msg->setValue(fastWriter.write(jrep));
+	return _state;
+     }
+  }
 }

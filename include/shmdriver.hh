@@ -19,7 +19,7 @@ namespace levbdim {
   class shmprocessor
   {
   public:
-    virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss);
+    virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss)=0;
   };
 
   class shmdriver 

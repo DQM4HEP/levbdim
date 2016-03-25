@@ -73,7 +73,7 @@ else:
   boostthread='boost_thread-mt'
   
 # includes
-INCLUDES=['include',"/usr/include/boost141/"]
+INCLUDES=['include',"/usr/include/boost141/","/usr/include/jsoncpp"]
 
 
 INCLUDES.append(commands.getoutput("python -c 'import distutils.sysconfig as conf; print conf.get_python_inc()'"))
@@ -84,7 +84,7 @@ CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "
 
 
 
-LIBRARIES=['pthread',  'm', 'stdc++','log4cxx',boostsystem,boostthread]
+LIBRARIES=['pthread',  'm', 'stdc++','log4cxx','jsoncpp',boostsystem,boostthread]
 
 
 

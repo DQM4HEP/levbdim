@@ -18,3 +18,10 @@ Json::Value fsmmessage::content()
 {
 	return _jsroot["content"];
 }
+void fsmmessage::setValue(std::string s)
+{
+  _sroot=s;
+  _jsroot.clear();
+	Json::Reader reader;
+    bool parsingSuccessful = reader.parse(s, _jsroot);
+}

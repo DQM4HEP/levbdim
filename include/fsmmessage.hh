@@ -17,6 +17,7 @@ namespace levbdim {
     std::string value();
     std::string command();
     Json::Value content();
+    void setValue(std::string s);
   private:
     std::string _sroot;
     Json::Value _jsroot;

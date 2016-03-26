@@ -30,6 +30,8 @@ void dummyServer::configure(levbdim::fsmmessage* m)
       delete (*it);
   _sources.clear();
   // Add a data source
+  // Parse the json message
+  // {"command": "CONFIGURE", "content": {"detid": 100, "sourceid": [23, 24, 26]}}
   Json::Value jc=m->content();
   int32_t det=jc["detid"].asInt();
   const Json::Value& books = jc["sourceid"];

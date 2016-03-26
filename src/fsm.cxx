@@ -44,10 +44,27 @@ void fsm::addState(std::string statename)
   
 void fsm::addTransition(std::string cmd,std::string istate,std::string fstate,PFunctor f)
 {
-  if (_transitions.find(cmd)!=_transitions.end()) return;
-  levbdim::fsmTransition t(istate,fstate,f);
-  std::pair<std::string,levbdim::fsmTransition> p(cmd,t);
-  _transitions.insert(p);
+  if (_transitions.find(cmd)!=_transitions.end())
+    {
+      std::map<std::string,std::vector<levbdim::fsmTransition> >::iterator iv=_transitions.find(cmd);
+      bool found=false;
+      for (std::vector<levbdim::fsmTransition>::iterator it=iv->second.begin();it!=iv->second.end();it++)
+	{
+	  if (it->initialState().compare(istate)==0)
+	    {/*already stor */ return;}
+	}
+      levbdim::fsmTransition t(istate,fstate,f);;
+      iv->second.push_back(t);
+
+    }
+  else
+    {
+      levbdim::fsmTransition t(istate,fstate,f);
+      std::vector<levbdim::fsmTransition> vp;
+      vp.push_back(t);
+      std::pair<std::string,std::vector<levbdim::fsmTransition> > p(cmd,vp);
+      _transitions.insert(p);
+    }
 }
 
 void fsm::setState(std::string s){ _state=s;}
@@ -56,7 +73,7 @@ void fsm::publishState() {_rpcState->updateService((char*) _state.c_str());}
 
 std::string fsm::processCommand(levbdim::fsmmessage* msg)
 {
-  std::map<std::string,levbdim::fsmTransition>::iterator it=_transitions.find(msg->command());
+  std::map<std::string,std::vector<levbdim::fsmTransition> >::iterator it=_transitions.find(msg->command());
   if (it==_transitions.end())
     {
       Json::Value jrep;
@@ -71,18 +88,38 @@ std::string fsm::processCommand(levbdim::fsmmessage* msg)
     }
   else
   {
-    if (it->second.initialState().compare(_state)!=0)
-      {
+    // loop on vector of transition
+    std::vector<levbdim::fsmTransition> &vp=it->second;
+    for (std::vector<levbdim::fsmTransition>::iterator ift=vp.begin();ift!=vp.end();ift++)
+      if (ift->initialState().compare(_state)==0)
+	{
+	  ift->callback()(msg);
+	  _state=ift->finalState();
+	  this->publishState();
+	  Json::Value jrep;
+	  std::stringstream s0;
+	  s0.str(std::string());  
+	  s0<<msg->command()<<"_DONE";
+	  jrep["command"]=s0.str();
+	  jrep["content"]["msg"]="OK";
+	  Json::FastWriter fastWriter;
+	  msg->setValue(fastWriter.write(jrep));
+	  return _state;
+
+	}
+    // No initialState corresponding to _state
+    //if (it->second.initialState().compare(_state)!=0)
+    //  {
         Json::Value jrep;
       jrep["command"]="FAILED";
       std::stringstream s0;
       s0.str(std::string());  
-      s0<<_state<<" is not ok for command "<<msg->command();
+      s0<<"Current State="<<_state<<" is not an initial state of the command "<<msg->command();
       jrep["content"]["msg"]=s0.str();
       Json::FastWriter fastWriter;
       msg->setValue(fastWriter.write(jrep));
       return "ERROR";
-      }
+      /*  }
       else
       {
 	it->second.callback()(msg);
@@ -98,5 +135,6 @@ std::string fsm::processCommand(levbdim::fsmmessage* msg)
 	msg->setValue(fastWriter.write(jrep));
 	return _state;
      }
+      */
   }
 }

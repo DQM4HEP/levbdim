@@ -55,7 +55,7 @@ namespace levbdim {
   private:
     std::vector<std::string> _states;
     std::string _state;
-    std::map<std::string,levbdim::fsmTransition> _transitions;
+    std::map<std::string,std::vector<levbdim::fsmTransition> > _transitions;
     levbdim::rpcFsmMessage* _rpc;
     DimService* _rpcState;
   };

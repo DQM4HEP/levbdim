@@ -1,5 +1,8 @@
 #include "dummyServer.hh"
-
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
+ 
 dummyServer::dummyServer(std::string name) : _running(false)
 {
   _fsm=new levbdim::fsm(name);
@@ -50,6 +53,7 @@ void dummyServer::configure(levbdim::fsmmessage* m)
 void dummyServer::readdata(levbdim::datasource *ds)
 {
   uint32_t evt=0,bx=0;
+  std::srand(std::time(0));
   while (_running)
     {
       ::usleep(10000);
@@ -61,7 +65,7 @@ void dummyServer::readdata(levbdim::datasource *ds)
       uint32_t psi=ds->buffer()->dataSourceId();
       
       uint32_t* pld=(uint32_t*) ds->payload();
-      for (int i=0;i<psi;i++) pld[i]=psi;
+      for (int i=0;i<psi;i++) pld[i]= std::rand();
       pld[0]=evt;
       pld[psi-1]=evt;
     

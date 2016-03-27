@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <zlib.h>
+#include <iostream>
 namespace levbdim {
 
   class buffer
@@ -36,6 +38,24 @@ namespace levbdim {
     uint32_t size(){return _psize+3*sizeof(uint32_t)+sizeof(uint64_t);}
     char* payload(){return &_ptr[3*sizeof(uint32_t)+sizeof(uint64_t)];}
     uint32_t payloadSize(){return _psize;}
+    void compress()
+    {
+      unsigned char obuf[0x20000];
+      unsigned long ldest=0x20000;
+      int rc=::compress(obuf,&ldest, (unsigned char*) payload(),payloadSize());
+      //std::cout<<_psize<<" "<<ldest<<std::endl;
+      memcpy(payload(),obuf,ldest);
+      _psize=ldest;
+    }
+    void uncompress()
+    {
+      unsigned char obuf[0x20000];
+      unsigned long ldest=0x20000;
+      int rc=::uncompress(obuf,&ldest, (unsigned char*) payload(),payloadSize());
+      //std::cout<<_psize<<" "<<ldest<<std::endl;
+      memcpy(payload(),obuf,ldest);
+      _psize=ldest;
+    }
   private:
     bool _allocate;
     char* _ptr;

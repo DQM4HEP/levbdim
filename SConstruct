@@ -143,5 +143,6 @@ EXE_LIBPATH=LIBRARY_PATHS
 EXE_LIBPATH.append("#lib")
 EXE_LIBS=LIBRARIES
 EXE_LIBS.append("levbdim")
-dum=env.Program("bin/dummy",source="test/dummyServer.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
+dums=env.Program("bin/dummyS",source="test/dummyServer.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
+dumb=env.Program("bin/dummyB",source="test/dummyBuilder.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
 

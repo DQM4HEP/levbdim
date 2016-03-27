@@ -89,8 +89,9 @@ void shmdriver::createDirectories()
 {
   std::stringstream sc;
   sc.str(std::string());
-  sc<<_memdir<<"/closed/";
-  int status = mkdir(sc.str().c_str(), S_IRWXU | S_IRWXG | S_IRWXO );	
+  sc<<_memdir<<"/closed";
+  int status = mkdir(sc.str().c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
+  std::cout<<sc.str().c_str()<<" is created "<<status<<std::endl;
 }
 
 void shmdriver::registerProcessor(levbdim::shmprocessor* p)
@@ -130,36 +131,42 @@ uint32_t shmdriver::numberOfDataSource(uint32_t k)
 
 void shmdriver::processEvents()
 {
-  for ( std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
+  while (_running)
     {
-      if (it->second.size()!=numberOfDataSource()) continue;
-      for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
+      for ( std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
 	{
-	  (*itp)->processEvent(it->first,it->second);
-	}
+	  if (it->second.size()!=numberOfDataSource()) continue;
+	  //std::cout<<"full  event find " <<it->first<<std::endl;
+	  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
+	    {
+	      (*itp)->processEvent(it->first,it->second);
+	    }
   
-    }
-  // remove completed events
-  for (std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();)
-    {
-		
-      if (it->second.size()==numberOfDataSource())
-	{
-	  for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
-	  it->second.clear();
-	  _eventMap.erase(it++);
 	}
-      else
-	it++;
+      // remove completed events
+      for (std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();)
+	{
+	  
+	  if (it->second.size()==numberOfDataSource())
+	    {
+	      for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
+	      it->second.clear();
+	      _eventMap.erase(it++);
+	    }
+	  else
+	    it++;
+	}
+      ::usleep(500);
     }
   
 }
     
 void shmdriver::start()
 {
+  _running=true;
   _gThread.create_thread(boost::bind(&levbdim::shmdriver::scanMemory, this));
   _gThread.create_thread(boost::bind(&levbdim::shmdriver::processEvents, this));
-  _running=true;
+
 }
 void shmdriver::scanMemory()
 {
@@ -186,7 +193,7 @@ void shmdriver::scanMemory()
 	      _eventMap.insert(p);
 	      it_gtc=_eventMap.find(idx_storage);
 	    }
-	  if (it_gtc->second.size()==this->numberOfDataSource())
+	  if (it_gtc->second.size()==this->numberOfDataSource() && it_gtc->first%100==0)
 	    printf("GTC %lu %lu  %d\n",it_gtc->first,it_gtc->second.size(),this->numberOfDataSource());
 	}
       usleep(500);	

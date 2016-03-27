@@ -53,7 +53,8 @@ uint32_t basicwriter::totalSize(){return _totalSize;}
 uint32_t basicwriter::eventNumber(){return _event;}
 void basicwriter::processEvent(uint32_t key,std::vector<levbdim::buffer*> vbuf)
 {
-  if (_started) return;
+
+  if (!_started) return;
   uint32_t theNumberOfDIF=vbuf.size();
   if (_event%100==0) 
     std::cout<<"Standard completion "<<_event<<" GTC "<<key<<" size "<<_totalSize<<std::endl;

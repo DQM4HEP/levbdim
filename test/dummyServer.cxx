@@ -53,8 +53,10 @@ void dummyServer::readdata(levbdim::datasource *ds)
   while (_running)
     {
       ::usleep(10000);
+      //      ::sleep(1);
       if (!_running) break;
-      std::cout<<"Thread of "<<ds->buffer()->dataSourceId()<<" is running "<<evt<<" "<<_running<<std::endl;
+      if (evt%100==0)
+	std::cout<<"Thread of "<<ds->buffer()->dataSourceId()<<" is running "<<evt<<" "<<_running<<std::endl;
       // Just fun , ds is publishing a buffer containing sourceid X int of value sourceid
       uint32_t psi=ds->buffer()->dataSourceId();
       

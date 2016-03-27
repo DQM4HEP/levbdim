@@ -22,7 +22,7 @@ namespace levbdim {
     bool isAlive();
     levbdim::buffer* buffer();
   private:
-    bool _alive;
+    uint32_t _count;
     DimInfo* _info;
     levbdim::buffer* _buffer;
     uint32_t _sourceid,_detid;

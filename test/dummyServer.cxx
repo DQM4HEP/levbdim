@@ -39,16 +39,30 @@ void dummyServer::configure(levbdim::fsmmessage* m)
   Json::Value jc=m->content();
   int32_t det=jc["detid"].asInt();
   const Json::Value& books = jc["sourceid"];
+  Json::Value array_keys;
   for (Json::ValueConstIterator it = books.begin(); it != books.end(); ++it)
     {
       const Json::Value& book = *it;
       int32_t sid=(*it).asInt();
     // rest as before
       std::cout <<"Creating datatsource "<<det<<" "<<sid<<std::endl;
+      array_keys.append((det<<16)|sid);
       levbdim::datasource* ds= new levbdim::datasource(det,sid,0x20000);
       _sources.push_back(ds);
 
     }
+
+  // Overwrite msg
+    //Prepare complex answer
+  m->setAnswer(array_keys);
+  /*
+  Json::Value rep;
+  rep["command"]=m->command();
+  rep["content"]=m->content();
+  rep["content"]["answer"]=array_keys;
+  Json::FastWriter fastWriter;
+  m->setValue(fastWriter.write(rep));
+  */
 }
 void dummyServer::readdata(levbdim::datasource *ds)
 {

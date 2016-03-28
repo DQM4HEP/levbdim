@@ -77,11 +77,13 @@ std::string fsm::processCommand(levbdim::fsmmessage* msg)
   if (it==_transitions.end())
     {
       Json::Value jrep;
-      jrep["command"]="FAILED";
+      jrep["command"]=msg->command();
+      jrep["status"]="FAILED";
       std::stringstream s0;
       s0.str(std::string());  
       s0<<msg->command()<<" not found in transitions list ";
-      jrep["content"]["msg"]=s0.str();
+      jrep["content"]=msg->content();
+      jrep["content"]["answer"]=s0.str();
       Json::FastWriter fastWriter;
       msg->setValue(fastWriter.write(jrep));
       return "ERROR";
@@ -100,8 +102,11 @@ std::string fsm::processCommand(levbdim::fsmmessage* msg)
 	  std::stringstream s0;
 	  s0.str(std::string());  
 	  s0<<msg->command()<<"_DONE";
-	  jrep["command"]=s0.str();
-	  jrep["content"]["msg"]="OK";
+
+	  jrep["command"]=msg->command();
+	  jrep["status"]="DONE";
+	  jrep["content"]=msg->content();
+	  //jrep["content"]["msg"]="OK";
 	  Json::FastWriter fastWriter;
 	  msg->setValue(fastWriter.write(jrep));
 	  return _state;
@@ -111,11 +116,13 @@ std::string fsm::processCommand(levbdim::fsmmessage* msg)
     //if (it->second.initialState().compare(_state)!=0)
     //  {
         Json::Value jrep;
-      jrep["command"]="FAILED";
+	jrep["command"]=msg->command();
+      jrep["status"]="FAILED";
       std::stringstream s0;
       s0.str(std::string());  
       s0<<"Current State="<<_state<<" is not an initial state of the command "<<msg->command();
-      jrep["content"]["msg"]=s0.str();
+      jrep["content"]=msg->content();
+      jrep["content"]["answer"]=s0.str();
       Json::FastWriter fastWriter;
       msg->setValue(fastWriter.write(jrep));
       return "ERROR";

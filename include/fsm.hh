@@ -20,6 +20,18 @@
 using namespace levbdim;
 typedef boost::function<void (levbdim::fsmmessage*)> PFunctor;
 namespace levbdim {
+  class fsmClient : public DimRpcInfo
+  {
+  public:
+    fsmClient(std::string name,int timeout=-1); 
+    void execute(levbdim::fsmmessage* m);
+    void rpcInfoHandler();
+    inline levbdim::fsmmessage* msg(){ return &_m;}
+  private:
+    boost::interprocess::interprocess_mutex _sem;
+    levbdim::fsmmessage _m;
+  };
+
   
   class fsmTransition
   {

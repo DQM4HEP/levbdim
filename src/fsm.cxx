@@ -1,5 +1,20 @@
 #include "fsm.hh"
 using namespace levbdim;
+
+fsmClient::fsmClient(std::string name,int timeout) : DimRpcInfo((char*) name.c_str(),-1)
+{_sem.lock();}
+void fsmClient::execute(levbdim::fsmmessage* m)
+{
+  setData((char*) m->value().c_str(),m->value().size());_sem.lock();
+}
+void fsmClient::rpcInfoHandler()
+{
+  std::string s;
+  s.assign((char*) getData());
+  _m.setValue(s);
+  _sem.unlock();
+}
+
 rpcFsmMessage::rpcFsmMessage(levbdim::fsm* serv,std::string name) : DimRpc(name.c_str(),"C","C"),_server(serv) {}
 void rpcFsmMessage::rpcHandler()
 {

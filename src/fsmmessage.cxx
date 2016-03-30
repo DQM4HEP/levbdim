@@ -1,5 +1,8 @@
 #include "fsmmessage.hh"
 using namespace levbdim;
+fsmmessage::fsmmessage()
+{}
+
 fsmmessage::fsmmessage(std::string s) : _sroot(s)
 {
 	_jsroot.clear();

@@ -11,7 +11,7 @@ namespace levbdim {
   class fsmmessage
   {
   public:
-
+    fsmmessage();
     fsmmessage(std::string s);
       
     std::string& value();

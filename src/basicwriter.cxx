@@ -51,6 +51,7 @@ void basicwriter::stop()
 }
 uint32_t basicwriter::totalSize(){return _totalSize;}
 uint32_t basicwriter::eventNumber(){return _event;}
+uint32_t basicwriter::runNumber(){return _run;}
 void basicwriter::processEvent(uint32_t key,std::vector<levbdim::buffer*> vbuf)
 {
 

@@ -22,6 +22,7 @@ namespace levbdim {
     virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss);
     uint32_t totalSize();
     uint32_t eventNumber();
+    uint32_t runNumber();
   private:
     std::string _directory;
     uint32_t _run,_event,_totalSize;

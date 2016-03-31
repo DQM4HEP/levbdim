@@ -34,6 +34,7 @@ void fsmmessage::setAnswer(Json::Value rep)
   msg["command"]=this->command();
   msg["content"]=this->content();
   msg["content"]["answer"]=rep;
+  std::cout<<msg;
   Json::FastWriter fastWriter;
   this->setValue(fastWriter.write(msg));
 }

@@ -29,8 +29,8 @@ void rpcFsmMessage::rpcHandler()
    
    levbdim::fsmmessage msg(smsg);
 
-   std::cout<<"RECEIVED: "<<msg.value()<<std::endl;
-   std::cout<<msg.value().size()<<std::endl;
+   //std::cout<<"RECEIVED: "<<msg.value()<<std::endl;
+   //std::cout<<msg.value().size()<<std::endl;
    
    _server->processCommand(&msg);
   

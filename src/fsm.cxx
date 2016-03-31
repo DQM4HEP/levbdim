@@ -7,6 +7,7 @@ void fsmClient::execute(levbdim::fsmmessage* m)
 {
   setData((char*) m->value().c_str(),m->value().size());_sem.lock();
 }
+
 void fsmClient::rpcInfoHandler()
 {
   std::string s;
@@ -26,7 +27,7 @@ void rpcFsmMessage::rpcHandler()
    
    levbdim::fsmmessage msg(smsg);
 
-    std::cout<<msg.value()<<std::endl;
+   std::cout<<"RECEIVED: "<<msg.value()<<std::endl;
    std::cout<<msg.value().size()<<std::endl;
    
    _server->processCommand(&msg);

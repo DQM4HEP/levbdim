@@ -27,6 +27,7 @@ void fsmmessage::setValue(std::string s)
   _jsroot.clear();
 	Json::Reader reader;
     bool parsingSuccessful = reader.parse(s, _jsroot);
+    std::cout<<"SETVALUE "<<_sroot<<std::endl;
 }
 void fsmmessage::setAnswer(Json::Value rep)
 {
@@ -34,7 +35,7 @@ void fsmmessage::setAnswer(Json::Value rep)
   msg["command"]=this->command();
   msg["content"]=this->content();
   msg["content"]["answer"]=rep;
-  std::cout<<msg;
+
   Json::FastWriter fastWriter;
   this->setValue(fastWriter.write(msg));
 }

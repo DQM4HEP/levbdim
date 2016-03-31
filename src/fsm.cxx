@@ -10,7 +10,9 @@ void fsmClient::execute(levbdim::fsmmessage* m)
 void fsmClient::rpcInfoHandler()
 {
   std::string s;
-  s.assign((char*) getData());
+
+  s.assign((char*) getData(),getSize());
+  //std::cout<<"fsmClient rec "<<getData()<<" et la string "<<s<<std::endl;
   _m.setValue(s);
   _sem.unlock();
 }

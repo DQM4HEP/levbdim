@@ -17,8 +17,8 @@ namespace levbdim {
   {
   public:
     basicwriter(std::string dire="/tmp");
-    void start(uint32_t run);
-    void stop();
+    virtual void start(uint32_t run);
+    virtual void stop();
     virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss);
     uint32_t totalSize();
     uint32_t eventNumber();

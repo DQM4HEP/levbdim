@@ -19,6 +19,8 @@ namespace levbdim {
   class shmprocessor
   {
   public:
+    virtual void start(uint32_t run)=0;
+    virtual void stop()=0;
     virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss)=0;
   };
 
@@ -39,7 +41,7 @@ namespace levbdim {
     uint32_t numberOfDataSource(uint32_t k);
     
     
-    void start();
+    void start(uint32_t nr);
     void scanMemory();
     void processEvents();
     void stop();
@@ -54,6 +56,8 @@ namespace levbdim {
     static void pull(std::string name,levbdim::buffer* buf,std::string sourcedir);
     static void store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t bxid,void* ptr,uint32_t size,std::string destdir);
 
+    inline uint32_t run(){return _run;}
+    inline uint32_t event(){return _evt;}
   private:
     std::string _memdir;
     bool _useEventId;
@@ -63,7 +67,7 @@ namespace levbdim {
 	
     boost::thread_group _gThread;
     bool _running;
-	
+    uint32_t _run,_evt;
   };
 };
 #endif

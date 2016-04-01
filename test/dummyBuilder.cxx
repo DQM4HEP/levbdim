@@ -63,8 +63,8 @@ void dummyBuilder::start(levbdim::fsmmessage* m)
     std::cout<<"Received "<<m->command()<<std::endl;
     Json::Value jc=m->content();
     int32_t run=jc["run"].asInt();
-    _writer->start(run);
-    _evb->start();
+    //_writer->start(run);
+    _evb->start(run);
     /*
     _running=true;
 
@@ -81,7 +81,7 @@ void dummyBuilder::stop(levbdim::fsmmessage* m)
   
     std::cout<<"Received "<<m->command()<<std::endl;
     _evb->stop();
-    _writer->stop();
+    //_writer->stop();
 }
 void dummyBuilder::halt(levbdim::fsmmessage* m)
 {

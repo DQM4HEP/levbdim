@@ -136,6 +136,7 @@ void shmdriver::processEvents()
       for ( std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
 	{
 	  if (it->second.size()!=numberOfDataSource()) continue;
+	  _evt=it->first;
 	  //std::cout<<"full  event find " <<it->first<<std::endl;
 	  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
 	    {
@@ -161,8 +162,16 @@ void shmdriver::processEvents()
   
 }
     
-void shmdriver::start()
+void shmdriver::start(uint32_t nr)
 {
+  // Do the start of the the processors
+  _run=nr;
+  _evt=0;
+  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
+    {
+      (*itp)->start(nr);
+    }
+
   _running=true;
   _gThread.create_thread(boost::bind(&levbdim::shmdriver::scanMemory, this));
   _gThread.create_thread(boost::bind(&levbdim::shmdriver::processEvents, this));
@@ -204,6 +213,13 @@ void shmdriver::stop()
 {
   _running=false;
   _gThread.join_all();
+
+  // Do the stop of the the processors
+  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
+    {
+      (*itp)->stop();
+    }
+
 }
     
 std::string shmdriver::name(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t bxid)

@@ -63,6 +63,7 @@ namespace levbdim {
     void addState(std::string statename);
     void addTransition(std::string cmd,std::string istate,std::string fstate,PFunctor f);
     void setState(std::string s);
+    std::string state();
     void publishState();
   private:
     std::vector<std::string> _states;

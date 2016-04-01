@@ -21,8 +21,8 @@ void fsmClient::rpcInfoHandler()
 rpcFsmMessage::rpcFsmMessage(levbdim::fsm* serv,std::string name) : DimRpc(name.c_str(),"C","C"),_server(serv) {}
 void rpcFsmMessage::rpcHandler()
 {
-  char msgi[1024];
-  memset(msgi,0,1024);
+  char msgi[32768];
+  memset(msgi,0,32768);
   memcpy(msgi,getData(),getSize());
   //printf("message %s \n",msgi);
    std::string smsg;smsg.assign(msgi);
@@ -86,7 +86,7 @@ void fsm::addTransition(std::string cmd,std::string istate,std::string fstate,PF
 }
 
 void fsm::setState(std::string s){ _state=s;}
-
+std::string fsm::state(){return _state;}
 void fsm::publishState() {_rpcState->updateService((char*) _state.c_str());}
 
 std::string fsm::processCommand(levbdim::fsmmessage* msg)

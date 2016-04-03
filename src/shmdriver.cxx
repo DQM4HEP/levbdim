@@ -136,6 +136,7 @@ void shmdriver::processEvents()
       for ( std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
 	{
 	  if (it->second.size()!=numberOfDataSource()) continue;
+	  if (it->first==0) continue; // do not process event 0
 	  _evt=it->first;
 	  //std::cout<<"full  event find " <<it->first<<std::endl;
 	  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)

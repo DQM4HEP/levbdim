@@ -18,7 +18,10 @@ namespace levbdim {
     buffer(char* ptr,uint32_t offset) : _allocate(false)
     {_ptr=&ptr[offset]; _iptr=(uint32_t*) _ptr;_i64ptr=(uint64_t*) &_ptr[3*sizeof(uint32_t)];_psize=0;}
     
-    ~buffer() { if (_allocate) delete _ptr;}
+    ~buffer() { if (_allocate)
+	{
+	  delete _ptr;}
+    }
     void setDetectorId(uint32_t id){ _iptr[0]=id;}
     void setDataSourceId(uint32_t id){ _iptr[1]=id;}
     void setEventId(uint32_t id){ _iptr[2]=id;}

@@ -52,7 +52,7 @@ namespace levbdim {
     static uint32_t sourceId(std::string name);
     static uint32_t eventId(std::string name);
     static uint64_t bxId(std::string name);
-    static std::vector<std::string> ls(std::string sourcedir);
+    static void ls(std::string sourcedir,std::vector<std::string> &res);
     static void pull(std::string name,levbdim::buffer* buf,std::string sourcedir);
     static void store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t bxid,void* ptr,uint32_t size,std::string destdir);
 

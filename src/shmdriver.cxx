@@ -81,6 +81,7 @@ void shmdriver::purgeShm(std::string memory_dir)
       memset(fname,0,256);
       sprintf(fname,"%s/%s",sc.str().c_str(),files[i-1]->d_name);
       unlink(fname);
+      free(files[i-1]);
     }
 	
 }
@@ -133,6 +134,8 @@ void shmdriver::processEvents()
 {
   while (_running)
     {
+      //if (_eventMap.size())
+      //	std::cout<<"Map size "<<_eventMap.size()<<std::endl;
       for ( std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
 	{
 	  if (it->second.size()!=numberOfDataSource()) continue;
@@ -151,6 +154,7 @@ void shmdriver::processEvents()
 	  
 	  if (it->second.size()==numberOfDataSource())
 	    {
+	      //std::cout<<"Deleting Event "<<it->first<<std::endl; 
 	      for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
 	      it->second.clear();
 	      _eventMap.erase(it++);
@@ -180,14 +184,19 @@ void shmdriver::start(uint32_t nr)
 }
 void shmdriver::scanMemory()
 {
+  //levbdim::buffer* b=new levbdim::buffer(0x80000);
+  std::vector<std::string> vnames;
   while (_running)
     {
-      std::vector<std::string> vnames=levbdim::shmdriver::ls(_memdir);
+      
+      levbdim::shmdriver::ls(_memdir,vnames);
       if (vnames.size()==0) {::sleep(1);continue;}
+      //continue;
       for ( std::vector<std::string>::iterator it=vnames.begin();it!=vnames.end();it++)
 	{
-	  levbdim::buffer* b=new levbdim::buffer(0x20000);
+	  levbdim::buffer* b=new levbdim::buffer(0x80000);
 	  levbdim::shmdriver::pull((*it),b,_memdir);
+	  //continue;
 	  uint64_t idx_storage=b->eventId(); // usually abcid
 
 	  std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it_gtc=_eventMap.find(idx_storage);
@@ -233,33 +242,33 @@ uint32_t shmdriver::detId(std::string name)
 {
   uint32_t d,s,e;
   uint64_t b;
-  sscanf(name.c_str(),"Event_%ud_%ud_%ud_%lu",&d,&s,&e,&b);
+  sscanf(name.c_str(),"Event_%u_%u_%u_%lu",&d,&s,&e,&b);
   return d;
 }
 uint32_t shmdriver::sourceId(std::string name)
 {
   uint32_t d,s,e;
   uint64_t b;
-  sscanf(name.c_str(),"Event_%ud_%ud_%ud_%lu",&d,&s,&e,&b);
+  sscanf(name.c_str(),"Event_%u_%u_%u_%lu",&d,&s,&e,&b);
   return s;
 }
 uint32_t shmdriver::eventId(std::string name)
 {
   uint32_t d,s,e;
   uint64_t b;
-  sscanf(name.c_str(),"Event_%ud_%ud_%ud_%lu",&d,&s,&e,&b);
+  sscanf(name.c_str(),"Event_%u_%u_%u_%lu",&d,&s,&e,&b);
   return e;
 }
 uint64_t shmdriver::bxId(std::string name)
 {
   uint32_t d,s,e;
   uint64_t b;
-  sscanf(name.c_str(),"Event_%ud_%ud_%ud_%lu",&d,&s,&e,&b);
+  sscanf(name.c_str(),"Event_%u_%u_%u_%lu",&d,&s,&e,&b);
   return b;
 }
-std::vector<std::string> shmdriver::ls(std::string sourcedir)
+void shmdriver::ls(std::string sourcedir,std::vector<std::string>& res)
 {
-  std::vector<std::string> res;
+ 
   res.clear();
   int count,i;  
   struct direct **files;  
@@ -269,17 +278,28 @@ std::vector<std::string> shmdriver::ls(std::string sourcedir)
   
   count = scandir(sc.str().c_str(), &files, file_select_2, alphasort); 		
   /* If no files found, make a non-selectable menu item */  
-  if(count <= 0)    {return res;}
+  if(count <= 0)    {return ;}
        
-		
+  std::stringstream sd;		
   //printf("Number of files = %d\n",count);  
   for (i=1; i<count+1; ++i)  
     {
       // file name
-      std::string fName(files[i-1]->d_name);
+      std::string fName;
+      fName.assign(files[i-1]->d_name);
       res.push_back(fName);
+       
+      /* sc.str(std::string());
+       sd.str(std::string());
+       sc<<sourcedir<<"/closed/"<<files[i-1]->d_name;
+       sd<<sourcedir<<"/"<<files[i-1]->d_name;
+       ::unlink(sc.str().c_str());
+       ::unlink(sd.str().c_str());
+      */
+       free(files[i-1]);
     }
-  return res;
+  
+  return;
 }
 
 void shmdriver::pull(std::string name,levbdim::buffer* buf,std::string sourcedir)
@@ -310,7 +330,7 @@ void shmdriver::store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t
   sc<<destdir<<"/closed/";
   char name[512];
   memset(name,0,512);
-  sprintf(name,"%s/Event_%ud_%ud_%ud_%lu",destdir.c_str(),detid,sourceid,eventid,bxid);
+  sprintf(name,"%s/Event_%u_%u_%u_%lu",destdir.c_str(),detid,sourceid,eventid,bxid);
   int fd= ::open(name,O_CREAT| O_RDWR | O_NONBLOCK,S_IRWXU);
   if (fd<0)
     {
@@ -328,7 +348,7 @@ void shmdriver::store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t
     }
   ::close(fd);
   memset(name,0,512);
-  sprintf(name,"%s/closed/Event_%ud_%ud_%ud_%lu",destdir.c_str(),detid,sourceid,eventid,bxid);
+  sprintf(name,"%s/closed/Event_%u_%u_%u_%lu",destdir.c_str(),detid,sourceid,eventid,bxid);
   fd= ::open(name,O_CREAT| O_RDWR | O_NONBLOCK,S_IRWXU);
   //std::cout<<st.str().c_str()<<" "<<fd<<std::endl;
   //write(fd,b,1);

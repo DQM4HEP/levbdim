@@ -44,6 +44,7 @@ namespace levbdim {
     void start(uint32_t nr);
     void scanMemory();
     void processEvents();
+    void processEvent(uint32_t id);
     void stop();
     
     static void purgeShm(std::string memdir);

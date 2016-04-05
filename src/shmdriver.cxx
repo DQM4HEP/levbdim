@@ -130,6 +130,28 @@ uint32_t shmdriver::numberOfDataSource(uint32_t k)
     return 0;
 }
 
+
+void shmdriver::processEvent(uint32_t idx)
+{
+  std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.find(idx);
+  if (it->second.size()!=numberOfDataSource()) return;
+  if (it->first==0) return; // do not process event 0
+  _evt=it->first;
+  std::cout<<"full  event find " <<it->first<<std::endl;
+  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
+    {
+      (*itp)->processEvent(it->first,it->second);
+    }
+
+  
+  // remove completed events
+  for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
+  it->second.clear();
+  _eventMap.erase(it);
+
+  
+}
+
 void shmdriver::processEvents()
 {
   while (_running)
@@ -179,7 +201,7 @@ void shmdriver::start(uint32_t nr)
 
   _running=true;
   _gThread.create_thread(boost::bind(&levbdim::shmdriver::scanMemory, this));
-  _gThread.create_thread(boost::bind(&levbdim::shmdriver::processEvents, this));
+  //_gThread.create_thread(boost::bind(&levbdim::shmdriver::processEvents, this));
 
 }
 void shmdriver::scanMemory()
@@ -212,10 +234,14 @@ void shmdriver::scanMemory()
 	      _eventMap.insert(p);
 	      it_gtc=_eventMap.find(idx_storage);
 	    }
-	  if (it_gtc->second.size()==this->numberOfDataSource() && it_gtc->first%100==0)
-	    printf("GTC %lu %lu  %d\n",it_gtc->first,it_gtc->second.size(),this->numberOfDataSource());
+	  if (it_gtc->second.size()==this->numberOfDataSource())
+	    {
+	      if (it_gtc->first%100==0)
+		printf("GTC %lu %lu  %d\n",it_gtc->first,it_gtc->second.size(),this->numberOfDataSource());
+	      this->processEvent(idx_storage);
+	    }
 	}
-      usleep(500);	
+      usleep(50000);	
 
     }
 }
@@ -298,7 +324,7 @@ void shmdriver::ls(std::string sourcedir,std::vector<std::string>& res)
       */
        free(files[i-1]);
     }
-  
+  free(files);
   return;
 }
 

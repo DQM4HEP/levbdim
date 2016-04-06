@@ -67,6 +67,7 @@ void basicwriter::processEvent(uint32_t key,std::vector<levbdim::buffer*> vbuf)
       for (std::vector<levbdim::buffer*>::iterator iv=vbuf.begin();iv!=vbuf.end();iv++) 
 	{
 	  //printf("\t writing %d bytes",idata[SHM_BUFFER_SIZE]);
+	  (*iv)->compress();
 	  uint32_t bsize=(*iv)->size();
 	  _totalSize+=bsize;
 	  ier=write(_fdOut,&bsize,sizeof(uint32_t));

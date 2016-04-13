@@ -1,0 +1,86 @@
+##############################################################################
+# cmake configuration file for levbdim
+#
+# requires:
+#   MacroCheckPackageLibs.cmake for checking package libraries
+#   MacroExportPackageDeps.cmake for exporting package dependencies
+#
+# returns following variables:
+#
+#   levbdim_FOUND      : set to TRUE if levbdim found
+#       if FIND_PACKAGE called with REQUIRED and COMPONENTS arguments
+#       levbdim_FOUND is only set to TRUE if ALL components are also found
+#       if REQUIRED is NOT set components may or may not be available
+#
+#   levbdim_ROOT       : path to this levbdim installation
+#   levbdim_VERSION    : package version
+#   levbdim_LIBRARIES  : list of levbdim libraries (NOT including COMPONENTS)
+#   levbdim_INCLUDE_DIRS  : list of paths to be used with INCLUDE_DIRECTORIES
+#   levbdim_LIBRARY_DIRS  : list of paths to be used with LINK_DIRECTORIES
+#   levbdim_COMPONENT_LIBRARIES      : list of levbdim component libraries
+#   levbdim_${COMPONENT}_FOUND       : set to TRUE or FALSE for each library
+#   levbdim_${COMPONENT}_LIBRARY     : path to individual libraries
+#   levbdim_${COMPONENT}_LIB_DEPENDS : individual library dependencies
+#
+# @author Jan Engels, Desy
+# Modified for levbdim use by : Remi Ete, IPNL
+##############################################################################
+
+SET( levbdim_ROOT "@CMAKE_INSTALL_PREFIX@" )
+SET( levbdim_VERSION "@levbdim_VERSION@" )
+
+
+# ---------- include dirs -----------------------------------------------------
+# do not store find results in cache
+SET( levbdim_INCLUDE_DIRS levbdim_INCLUDE_DIRS-NOTFOUND )
+MARK_AS_ADVANCED( levbdim_INCLUDE_DIRS )
+
+FIND_PATH( levbdim_INCLUDE_DIRS
+	NAMES levbdimConfig.hh
+	PATHS ${levbdim_ROOT}/include/
+	NO_DEFAULT_PATH
+)
+
+
+
+# ---------- libraries --------------------------------------------------------
+INCLUDE( "@CMAKE_INSTALL_PREFIX@/cmake/MacroCheckPackageLibs.cmake" )
+
+# only standard libraries should be passed as arguments to CHECK_PACKAGE_LIBS
+# additional components are set by cmake in variable PKG_FIND_COMPONENTS
+# first argument should be the package name
+CHECK_PACKAGE_LIBS( levbdim levbdim )
+
+
+
+# ---------- dependencies -----------------------------------------------------
+INCLUDE( "@CMAKE_INSTALL_PREFIX@/cmake/MacroExportPackageDeps.cmake" )
+# exports following package dependencies (if set)
+# first argument of macro should be the package name
+SET( levbdim_DEPENDS_INCLUDE_DIRS  @levbdim_DEPENDS_INCLUDE_DIRS@ )
+SET( levbdim_DEPENDS_LIBRARY_DIRS  @levbdim_DEPENDS_LIBRARY_DIRS@ )
+SET( levbdim_DEPENDS_LIBRARIES  @levbdim_DEPENDS_LIBRARIES@ )
+EXPORT_PACKAGE_DEPENDENCIES( levbdim )
+
+
+
+# ---------- final checking ---------------------------------------------------
+INCLUDE( FindPackageHandleStandardArgs )
+# set levbdim_FOUND to TRUE if all listed variables are TRUE and not empty
+# levbdim_COMPONENT_VARIABLES will be set if FIND_PACKAGE is called with REQUIRED argument
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( levbdim DEFAULT_MSG levbdim_ROOT levbdim_INCLUDE_DIRS levbdim_LIBRARIES ${levbdim_COMPONENT_VARIABLES} )
+
+SET( levbdim_FOUND ${levbdim_FOUND} )
+
+
+
+# ---------- definitions ------------------------------------------------------
+IF( levbdim_FOUND )
+
+    IF( CMAKE_BUILD_TYPE STREQUAL "Debug" OR
+        CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" )
+        MARK_AS_ADVANCED( levbdim_DEFINITIONS )
+    ENDIF()
+
+ENDIF()
+

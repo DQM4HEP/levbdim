@@ -1,0 +1,17 @@
+#ifndef levbdimConfig_H
+#define levbdimConfig_H
+
+// version macros
+#define levbdim_MAJOR_VERSION @levbdim_VERSION_MAJOR@
+#define levbdim_MINOR_VERSION @levbdim_VERSION_MINOR@
+#define levbdim_PATCH_LEVEL @levbdim_VERSION_PATCH@
+#define levbdim_VERSION_STR "@levbdim_VERSION_MAJOR@.@levbdim_VERSION_MINOR@.@levbdim_VERSION_PATCH@"
+#define levbdim_VERSION_GE( MAJV , MINV , PLEV )  \
+     ( (levbdim_MAJOR_VERSION > MAJV) || ( (levbdim_MAJOR_VERSION == MAJV) && (levbdim_MINOR_VERSION > MINV) ) \
+  || ( (levbdim_MAJOR_VERSION == MAJV) && (levbdim_MINOR_VERSION == MINV) && (levbdim_PATCH_LEVEL >= PLEV) ) )
+
+// project source dir
+#define levbdim_DIR "@PROJECT_SOURCE_DIR@"
+
+
+#endif // levbdimConfig_H

@@ -70,5 +70,5 @@ namespace levbdim {
     bool _running;
     uint32_t _run,_evt;
   };
-};
+}
 #endif

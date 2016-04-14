@@ -66,5 +66,5 @@ namespace levbdim {
     uint64_t* _i64ptr;
     uint32_t _psize;
   };
-};
+}
 #endif

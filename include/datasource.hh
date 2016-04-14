@@ -27,5 +27,5 @@ namespace levbdim {
     std::string _name;
     int32_t _fdOut;
   };
-};
+}
 #endif

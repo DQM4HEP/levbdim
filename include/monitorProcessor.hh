@@ -29,5 +29,5 @@ namespace levbdim {
     int32_t _fdOut;
     bool _started;
   };
-};
+}
 #endif

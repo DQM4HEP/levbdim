@@ -72,5 +72,5 @@ namespace levbdim {
     levbdim::rpcFsmMessage* _rpc;
     DimService* _rpcState;
   };
-};
+}
 #endif

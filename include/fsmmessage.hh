@@ -23,5 +23,5 @@ namespace levbdim {
     std::string _sroot;
     Json::Value _jsroot;
   };
-};
+}
 #endif

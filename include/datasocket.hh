@@ -28,5 +28,5 @@ namespace levbdim {
     uint32_t _sourceid,_detid;
     std::string _name,_memdir;
   };
-};
+}
 #endif

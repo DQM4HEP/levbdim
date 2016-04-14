@@ -54,7 +54,7 @@ INCLUDE_DIRECTORIES( include )
 
 # require proper c++
 ADD_DEFINITIONS( "-pedantic -Wunused-value -O2" )
-ADD_DEFINITIONS("-Wno-long-long -Wreturn-type")
+ADD_DEFINITIONS("-Wno-long-long -Wreturn-type -Werror")
 
 FILE( GLOB
     SRC_FILES

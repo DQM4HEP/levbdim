@@ -90,6 +90,9 @@ IF( BUILD_TESTS )
 
 ENDIF()
 
+IF( NOT ${CMAKE_INSTALL_PREFIX} EQUAL ${PROJECT_SOURCE_DIR} )
+	INSTALL_DIRECTORY( include DESTINATION . FILES_MATCHING PATTERN "*.hh" )
+ENDIF()
 
 ###############################
 # display some variables and write them to cache

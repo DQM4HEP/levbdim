@@ -21,14 +21,13 @@
 #include "datasource.hh"
 #include "datasocket.hh"
 extern  int alphasort(); //Inbuilt sorting function  
-#define FALSE 0  
-#define TRUE !FALSE      
+
 int file_select_2(const struct direct *entry)  
 {  
   if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0))  
-    return (FALSE);  
+    return (0);
   else  
-    return (TRUE);  
+    return (1);
 }  
 using namespace levbdim;
 shmdriver::shmdriver(std::string memdir, bool useevent) : _memdir(memdir),_useEventId(useevent),_running(false)

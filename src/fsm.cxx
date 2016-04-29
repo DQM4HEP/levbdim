@@ -163,3 +163,14 @@ std::string fsm::processCommand(levbdim::fsmmessage* msg)
       */
   }
 }
+Json::Value fsm::transitionsList()
+{
+  Json::Value jrep;jrep.clear();
+  for( std::map<std::string,std::vector<levbdim::fsmTransition> >::iterator it=_transitions.begin();it!=_transitions.end();it++)
+    {
+      Json::Value jc;
+      jc["name"]=it->first;
+      jrep.append(jc);
+    }
+  return jrep;
+}

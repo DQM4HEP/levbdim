@@ -73,6 +73,7 @@ if Use_Dim:
    INCLUDES.append("/opt/dhcal/dim/dim")
    LIBRARIES.append("dim")
    LIBRARY_PATHS.append("/opt/dhcal/dim/linux")
+LIBRARY_PATHS.append("/opt/dhcal/lib")
 
 
 #link flags
@@ -115,6 +116,6 @@ EXE_LIBPATH=LIBRARY_PATHS
 EXE_LIBPATH.append("#lib")
 EXE_LIBS=LIBRARIES
 #EXE_LIBS.append("levbdim")
-dums=env.Program("bin/wummyS",source="fsmweb.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
+dums=env.Program("bin/wummyS",source="../src/fsmweb.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
 #dumb=env.Program("bin/dummyB",source="test/dummyBuilder.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
 

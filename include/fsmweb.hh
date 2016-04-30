@@ -7,7 +7,7 @@
 using namespace std;
 using namespace Mongoose;
 class FSMMongo;
-typedef boost::function<void (Mongoose::Request&,Mongoose::JsonResponse)> MGRFunctor;
+typedef boost::function<void (Mongoose::Request&,Mongoose::JsonResponse&)> MGRFunctor;
 class fsmweb : public levbdim::fsm
 {
 public:

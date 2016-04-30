@@ -73,7 +73,7 @@ else:
   boostthread='boost_thread-mt'
   
 # includes
-INCLUDES=['include',"/usr/include/boost141/","/usr/include/jsoncpp"]
+INCLUDES=['include',"/usr/include/boost141/","/usr/include/jsoncpp","/usr/local/include","/usr/local/include/mongoose"]
 
 
 INCLUDES.append(commands.getoutput("python -c 'import distutils.sysconfig as conf; print conf.get_python_inc()'"))
@@ -84,7 +84,7 @@ CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "
 
 
 
-LIBRARIES=['pthread',  'm', 'stdc++','log4cxx','jsoncpp','z',boostsystem,boostthread]
+LIBRARIES=['pthread',  'm', 'stdc++','log4cxx','jsoncpp','z','mongoose',boostsystem,boostthread]
 
 
 
@@ -104,6 +104,7 @@ if Use_Dim:
 
 
 #link flags
+#LDFLAGS=["-fPIC","-dynamiclib"]
 LDFLAGS=["-fPIC","-dynamiclib"]
 
 

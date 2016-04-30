@@ -57,7 +57,9 @@ void fsmweb::handleRequest(Request &request, JsonResponse &response)
 	  return;
 	  
 	}
-      icmd->second(request,response);
+      JsonResponse pRep;
+      icmd->second(request,pRep);
+      response["answer"]=pRep;
       response["status"]="OK";
       return;
     }
@@ -109,6 +111,7 @@ void FSMMongo::fsmProcess(Request &request, JsonResponse &response)
       levbdim::fsmmessage m;
       m.setValue(fastWriter.write(v));
       std::cout<<"CALLING FSM "<<m.value();
+      std::cout<<"CALLING FSM CONTENT "<<m.content();
       std::string res=_fsm->processCommand(&m);
       std::cout<<"RC FSM "<<res<<"==>"<<m.value();
       parsing =reader.parse(m.value(),response);

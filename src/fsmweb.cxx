@@ -125,6 +125,7 @@ void FSMMongo::cmdProcess(Request &request, JsonResponse &response)
 
 void FSMMongo::List(Request &request, JsonResponse &response)
 {
+  response["PREFIX"]=_name;
   response["FSM"]=_fsm->transitionsList();
   response["CMD"]=_fsm->commandsList();
   response["STATE"]=_fsm->state();
@@ -133,6 +134,7 @@ void FSMMongo::List(Request &request, JsonResponse &response)
 void FSMMongo::setup()
 {
   // Example of prefix, putting all the urls into "/api"
+  addRouteResponse("GET", "/", FSMMongo,List, JsonResponse);
   std::stringstream os;
   os<<"/"<<_name;
   setPrefix(os.str());

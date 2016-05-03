@@ -18,6 +18,7 @@ public:
   void addCommand(std::string s,MGRFunctor f);
   void handleRequest(Request &request, JsonResponse &response);
   Json::Value commandsList();
+  virtual std::string processCommand(levbdim::fsmmessage* msg);
 private:
   FSMMongo* _service;
   bool _running;

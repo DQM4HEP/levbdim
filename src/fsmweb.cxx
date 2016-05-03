@@ -41,9 +41,13 @@ void fsmweb::start(uint32_t port)
 
 std::string fsmweb::processCommand(levbdim::fsmmessage* msg)
 {
-  if (_webState)
-    _webState->updateService();
-  return levbdim::fsm::processCommand(msg);
+  if (_webState!=NULL && msg->command().compare("?")==0)
+    {
+      _webState->updateService();
+      return this->state();
+    }
+  else
+    return levbdim::fsm::processCommand(msg);
 }
 void fsmweb::stop()
 {

@@ -23,6 +23,8 @@ private:
   bool _running;
   boost::thread_group g_d;
   std::map<std::string,MGRFunctor> _commands;
+  std::string _webName,_name;
+  DimService* _webState;
 };
 
 

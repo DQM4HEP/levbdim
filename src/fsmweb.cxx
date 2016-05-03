@@ -1,5 +1,7 @@
 #include "fsmweb.hh"
-fsmweb::fsmweb(std::string name) : levbdim::fsm(name),_running(false)
+#include <iostream>
+#include <sstream>
+fsmweb::fsmweb(std::string name) : levbdim::fsm(name),_running(false),_name(name)
 {
   _commands.clear();
   _service= new FSMMongo(name,this);
@@ -23,6 +25,18 @@ void fsmweb::serving(uint32_t port)
 void fsmweb::start(uint32_t port)
 {
   _running=true;
+  std::stringstream s0;
+  std::stringstream sw;
+  s0.str(std::string());
+  sw.str(std::string());
+  s0<<"/FSM/"<<_name<<"/WEB";
+  char hostname[80];
+  gethostname(hostname,80);
+  sw<<"http://"<<hostname<<":"<<port<<"/"<<_name;
+  _webName=sw.str();
+  _webState=new DimService(s0.str().c_str(),(char*) _webName.c_str());
+  _webState->updateService();
+
   g_d.create_thread(boost::bind(&fsmweb::serving,this,port));
 }
 void fsmweb::stop()

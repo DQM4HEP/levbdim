@@ -116,6 +116,8 @@ void FSMMongo::fsmProcess(Request &request, JsonResponse &response)
   Json::Value v; v.clear();
   std::string scommand=request.get("command", "NOTSET");
   std::string scontent=request.get("content", "NOTSET");
+  std::cout<<"command=>"<<scommand<<std::endl;
+  std::cout<<"content=>"<<scontent<<std::endl;
   if (scommand.compare("NOTSET")==0 || scontent.compare("NOTSET")==0)
     {
       response["status"]="No command or content given";

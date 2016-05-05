@@ -75,15 +75,16 @@ std::string processStatus(uint32_t lpid)
 
 processData::processData(const std::string &jsonString) : m_string(jsonString)
 {
+  //  std::cout<<" On rentre dans process Data"<<std::endl;
   Json::Reader reader;
   bool parsingSuccessful = reader.parse(jsonString, m_processInfo);
-  
+  // std::cout<<" On rentre dans process Data 1"<<std::endl;
   if (parsingSuccessful)
     {
       Json::StyledWriter styledWriter;
       std::cout << styledWriter.write(m_processInfo) << std::endl;
     }
-  
+  // std::cout<<" On rentre dans process Data 2"<<std::endl;
   m_childPid = 0;
   m_status = NOT_CREATED;
 
@@ -135,8 +136,11 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
   // Parse the json message
   // {"command": "CONFIGURE", "content": {"detid": 100, "sourceid": [23, 24, 26]}}
   Json::Value jc=m->content();
+  std::string fileName=jc["file"].asString();
   Json::Reader reader;
-  bool parsingSuccessful = reader.parse(jc["config"].asString(), m_jfile);
+  std::ifstream ifs (fileName.c_str(), std::ifstream::in);
+
+  bool parsingSuccessful = reader.parse(ifs, m_jfile,false);
 
   if (parsingSuccessful)
     {
@@ -297,15 +301,22 @@ void fsmjob::killProcess(uint32_t pid, uint32_t sig)
 
 void fsmjob::start(levbdim::fsmmessage* m)
 {
+  //  std::cout<<"ON RENTRE "<<m_jconf<<std::endl;
   const Json::Value& books = m_jconf;
+  Json::FastWriter fastWriter;
   for (Json::ValueConstIterator it = books.begin(); it != books.end(); ++it)
     {
       const Json::Value& book = *it;
-      std::string jsonString = book.asString();
 
+      //  std::cout<<"In Start "<<book<<std::endl;
+      std::string jsonString = fastWriter.write(book);
+      // std::cout<<"In Start1 "<<std::endl;
 		// create, start and register the process
       levbdim::processData *pProcessData = new levbdim::processData(jsonString);
+      //std::cout<<" apres le process "<<std::endl;
+      //getchar();
       this->startProcess(pProcessData);
+      //std::cout<<" apres le start "<<pProcessData->m_childPid<<std::endl;
       m_processMap.insert(PidToProcessMap::value_type(pProcessData->m_childPid, pProcessData));
 
     }
@@ -356,7 +367,7 @@ void fsmjob::status(Mongoose::Request &request, Mongoose::JsonResponse &response
 }
 void fsmjob::killjob(Mongoose::Request &request, Mongoose::JsonResponse &response)
 {
-  std::string name=request.get("name","NONE");
+  std::string name=request.get("processname","NONE");
   uint32_t pid =atol(request.get("pid","0").c_str());
   uint32_t sig =atol(request.get("signal","9").c_str());
   if (pid ==0 && name.compare("NONE")==0)
@@ -392,7 +403,7 @@ void fsmjob::killjob(Mongoose::Request &request, Mongoose::JsonResponse &respons
 }
 void fsmjob::restartjob(Mongoose::Request &request, Mongoose::JsonResponse &response)
 {
-  std::string name=request.get("name","NONE");
+  std::string name=request.get("processname","NONE");
   uint32_t pid =atol(request.get("pid","0").c_str());
   uint32_t sig =atol(request.get("signal","9").c_str());
   if (pid ==0 && name.compare("NONE")==0)
@@ -429,7 +440,7 @@ void fsmjob::restartjob(Mongoose::Request &request, Mongoose::JsonResponse &resp
 
 void fsmjob::joblog(Mongoose::Request &request, Mongoose::JsonResponse &response)
 {
-  std::string name=request.get("name","NONE");
+  std::string name=request.get("processname","NONE");
   uint32_t pid =atol(request.get("pid","0").c_str());
   uint32_t nlines=atol(request.get("lines","100").c_str());
 

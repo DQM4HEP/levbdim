@@ -55,6 +55,8 @@ public:
   void joblog(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void killjob(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void restartjob(Mongoose::Request &request, Mongoose::JsonResponse &response);
+  void registerjob(Mongoose::Request &request, Mongoose::JsonResponse &response);
+  void registerfile(Mongoose::Request &request, Mongoose::JsonResponse &response);
 protected:
   void startProcess(levbdim::processData* pd);
   void killProcess(uint32_t pid,uint32_t sig=9);

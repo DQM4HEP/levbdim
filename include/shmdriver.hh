@@ -33,6 +33,7 @@ namespace levbdim {
     void cleanShm();
     void clear();
     void createDirectories();
+    void registerProcessor(std::string name);
     void registerProcessor(levbdim::shmprocessor* p);
     void unregisterProcessor(levbdim::shmprocessor* p);
     void registerDataSource(uint32_t det,uint32_t ds);

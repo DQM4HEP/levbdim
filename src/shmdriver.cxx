@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 
 
 #include "shmdriver.hh"
@@ -99,6 +100,27 @@ void shmdriver::registerProcessor(levbdim::shmprocessor* p)
 {
   _processors.push_back(p);
 }
+
+void  shmdriver::registerProcessor(std::string name)
+{
+  std::stringstream s;
+  s<<"lib"<<name<<".so";
+  void* library = dlopen(s.str().c_str(), RTLD_NOW);
+
+  printf("%s %x \n",dlerror(),library);
+    // Get the loadFilter function, for loading objects
+  levbdim::shmprocessor* (*create)();
+  create = (levbdim::shmprocessor* (*)())dlsym(library, "loadProcessor");
+  printf("%s %x \n",dlerror(),create);
+  printf("%s lods to %x \n",s.str().c_str(),create); 
+  //void (*destroy)(Filter*);
+  // destroy = (void (*)(Filter*))dlsym(library, "deleteFilter");
+    // Get a new filter object
+  levbdim::shmprocessor* a=(levbdim::shmprocessor*) create();
+  _processors.push_back(a);
+}
+
+
 void shmdriver::unregisterProcessor(levbdim::shmprocessor* p)
 {
   std::vector<levbdim::shmprocessor*>::iterator it=std::find(_processors.begin(),_processors.end(),p);

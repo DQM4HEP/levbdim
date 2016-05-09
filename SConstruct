@@ -144,6 +144,10 @@ EXE_LIBPATH=LIBRARY_PATHS
 EXE_LIBPATH.append("#lib")
 EXE_LIBS=LIBRARIES
 EXE_LIBS.append("levbdim")
+
+
+plugbase=env.SharedLibrary("lib/basicwriter",source="src/basicwriter.cc",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
+EXE_LIBS.append("basicwriter")
 dums=env.Program("bin/dummyS",source="test/dummyServer.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
 dumb=env.Program("bin/dummyB",source="test/dummyBuilder.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
 ljcb=env.Program("bin/ljc",source="test/ljc.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)	

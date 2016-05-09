@@ -88,3 +88,18 @@ void basicwriter::processEvent(uint32_t key,std::vector<levbdim::buffer*> vbuf)
 
 
 }
+extern "C" 
+{
+    // loadDHCALAnalyzer function creates new LowPassDHCALAnalyzer object and returns it.  
+  levbdim::shmprocessor* loadProcessor(void)
+    {
+      return (new levbdim::basicwriter);
+    }
+    // The deleteDHCALAnalyzer function deletes the LowPassDHCALAnalyzer that is passed 
+    // to it.  This isn't a very safe function, since there's no 
+    // way to ensure that the object provided is indeed a LowPassDHCALAnalyzer.
+  void deleteProcessor(levbdim::shmprocessor* obj)
+    {
+      delete obj;
+    }
+}

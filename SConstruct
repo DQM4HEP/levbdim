@@ -84,7 +84,7 @@ CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "
 
 
 
-LIBRARIES=['pthread',  'm', 'stdc++','log4cxx','jsoncpp','z','mongoose',boostsystem,boostthread]
+LIBRARIES=['pthread',  'm', 'stdc++','log4cxx','jsoncpp','z','mongoose','curl',boostsystem,boostthread]
 
 
 

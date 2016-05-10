@@ -9,3 +9,4 @@ cmake -DEXAMPLES=ON -DWEBSOCKET=ON  -DHAS_JSONCPP=ON ..
 make -j4
 sudo make install
 
+

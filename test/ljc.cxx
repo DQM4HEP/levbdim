@@ -1,7 +1,13 @@
 #include "fsmjob.hh"
+#include <unistd.h>
+
 int main()
 {
-  levbdim::fsmjob s("LJC",9999);
+  char hostn[80];
+  gethostname(hostn,80);
+  std::stringstream s;
+  s<<"LJC-"<<hostn;
+  levbdim::fsmjob fs(s.str(),9999);
   while (1)
     {
       ::sleep(1);

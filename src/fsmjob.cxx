@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+std::string wget(std::string url);
 
 using namespace levbdim;
 
@@ -101,10 +102,14 @@ fsmjob::fsmjob(std::string name,uint32_t port)  : m_port(port)
 
   // Register state
   _fsm->addState("CREATED");
+  _fsm->addState("REGISTERING");
   _fsm->addState("INITIALISED");
   _fsm->addState("RUNNING");
 
   _fsm->addTransition("INITIALISE","CREATED","INITIALISED",boost::bind(&fsmjob::initialise, this,_1));
+  _fsm->addTransition("REGISTRATION","CREATED","REGISTERING",boost::bind(&fsmjob::registration, this,_1));
+  _fsm->addTransition("REGISTERJOB","REGISTERING","REGISTERING",boost::bind(&fsmjob::registerjob, this,_1));
+  _fsm->addTransition("ENDREGISTRATION","REGISTERING","INITIALISED",boost::bind(&fsmjob::endregistration, this,_1));
   _fsm->addTransition("START","INITIALISED","RUNNING",boost::bind(&fsmjob::start, this,_1));
   _fsm->addTransition("KILL","RUNNING","INITIALISED",boost::bind(&fsmjob::kill, this,_1));
   _fsm->addTransition("DESTROY","INITIALISED","CREATED",boost::bind(&fsmjob::destroy, this,_1));
@@ -113,7 +118,7 @@ fsmjob::fsmjob(std::string name,uint32_t port)  : m_port(port)
   _fsm->addCommand("JOBLOG",boost::bind(&fsmjob::joblog, this,_1,_2));
   _fsm->addCommand("KILLJOB",boost::bind(&fsmjob::killjob, this,_1,_2));
   _fsm->addCommand("RESTARTJOB",boost::bind(&fsmjob::restartjob, this,_1,_2));
-  _fsm->addCommand("REGISTERJOB",boost::bind(&fsmjob::registerjob, this,_1,_2));
+  //_fsm->addCommand("REGISTERJOB",boost::bind(&fsmjob::registerjob, this,_1,_2));
   _fsm->addCommand("REGISTERFILE",boost::bind(&fsmjob::registerfile, this,_1,_2));
 
   //Start server
@@ -128,6 +133,23 @@ fsmjob::fsmjob(std::string name,uint32_t port)  : m_port(port)
   _fsm->start(port);
 }
 
+
+void fsmjob::registration(levbdim::fsmmessage* m)
+{
+  std::cout<<"Received "<<m->command()<<std::endl;
+  std::cout<<"Received "<<m->value()<<std::endl;
+
+  // Delet existing datasources
+  m_jfile.clear();m_jconf.clear();
+}
+void fsmjob::endregistration(levbdim::fsmmessage* m)
+{
+  std::cout<<"Received "<<m->command()<<std::endl;
+  std::cout<<"Received "<<m->value()<<std::endl;
+
+  m->setAnswer(m_jconf);
+}
+
 void fsmjob::initialise(levbdim::fsmmessage* m)
 {
   std::cout<<"Received "<<m->command()<<std::endl;
@@ -135,30 +157,51 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
 
   // Delet existing datasources
   m_jfile.clear();m_jconf.clear();
-  return;
-  /*  for (PidToProcessMap::iterator it=m_processMap.begin();it!=m_processMap.end();it++)
+ 
+  for (PidToProcessMap::iterator it=m_processMap.begin();it!=m_processMap.end();it++)
       delete it->second;
   m_processMap.clear();
   // Add a data source
   // Parse the json message
   // {"command": "CONFIGURE", "content": {"detid": 100, "sourceid": [23, 24, 26]}}
   Json::Value jc=m->content();
-  std::string fileName=jc["file"].asString();
-  Json::Reader reader;
-  std::ifstream ifs (fileName.c_str(), std::ifstream::in);
-
-  bool parsingSuccessful = reader.parse(ifs, m_jfile,false);
-
-  if (parsingSuccessful)
+  if (jc.isMember("file"))
     {
-      m_jconf=m_jfile["HOSTS"][m_hostname];
-      Json::StyledWriter styledWriter;
-      std::cout << styledWriter.write(m_jconf) << std::endl;
+      std::string fileName=jc["file"].asString();
+      Json::Reader reader;
+      std::ifstream ifs (fileName.c_str(), std::ifstream::in);
+      
+      bool parsingSuccessful = reader.parse(ifs, m_jfile,false);
+      
+      if (parsingSuccessful)
+	{
+	  m_jconf=m_jfile["HOSTS"][m_hostname];
+	  Json::StyledWriter styledWriter;
+	  std::cout << styledWriter.write(m_jconf) << std::endl;
+	}
     }
+  else
+    if (jc.isMember("url"))
+      {
+	std::string url=jc["url"].asString();
+	//std::cout<<url<<std::endl;
+	std::string jsconf=wget(url);
+	//std::cout<<jsconf<<std::endl;
+	Json::Reader reader;
+	bool parsingSuccessful = reader.parse(jsconf, m_jfile);
+	
+	if (parsingSuccessful)
+	  {
+	    m_jconf=m_jfile["HOSTS"][m_hostname];
+	    Json::StyledWriter styledWriter;
+	    std::cout << styledWriter.write(m_jconf) << std::endl;
+	  }
+      }
+  
   // Overwrite msg
     //Prepare complex answer
   m->setAnswer(m_jconf);
-  */
+ 
 }
 void fsmjob::startProcess(levbdim::processData* pProcessData)
 {
@@ -488,46 +531,19 @@ void fsmjob::joblog(Mongoose::Request &request, Mongoose::JsonResponse &response
 }
 
 
-void fsmjob::registerjob(Mongoose::Request &request, Mongoose::JsonResponse &response)
+void fsmjob::registerjob(levbdim::fsmmessage* m)
 {
-  if (_fsm->state().compare("INITIALISED")!=0)
-    {
-      response["STATUS"]="cannot register jobs if not initialised";
-      return;
-
-    }
-  std::string pname=request.get("processname","NONE");
-  std::string pargs=request.get("processargs","NONE");
-  std::string penv=request.get("processenv","NONE");
-  std::string pbin=request.get("processbin","NONE");
+  Json::Value jcr=m->content();
+  std::string pname=jcr["processname"].asString();
+  std::string pargs=jcr["processargs"].asString();
+  std::string penv=jcr["processenv"].asString();
+  std::string pbin=jcr["processbin"].asString();
 
 
   std::cout <<pname<<std::endl;
   std::cout <<pargs<<std::endl;
   std::cout <<penv<<std::endl;
   std::cout <<pbin<<std::endl;
-  if (pname.compare("NONE")==0)
-    {
-      response["STATUS"]="No process NAME given";
-      return;
-    }
-  if (pargs.compare("NONE")==0)
-    {
-      response["STATUS"]="No process ARGS given";
-      return;
-    }
-  if (penv.compare("NONE")==0)
-    {
-      response["STATUS"]="No process ENV given";
-      return;
-    }
-    if (pbin.compare("NONE")==0)
-    {
-      response["STATUS"]="No process PROGRAM given";
-      return;
-    }
-
-
     Json::Value jc,jargs,jenv,jbin;
   jc["NAME"]=pname;
 
@@ -544,13 +560,11 @@ void fsmjob::registerjob(Mongoose::Request &request, Mongoose::JsonResponse &res
     {
       if ((*it)["NAME"].asString().compare(pname)==0)
 	{
-	  response["STATUS"]="Job already register";
 	  return;
 	}
     }
   m_jconf.append(jc);
-  response["JOBS"]=m_jconf;
-  response["STATUS"]="DONE";
+  m->setAnswer(m_jconf);
     
 }
 void fsmjob::registerfile(Mongoose::Request &request, Mongoose::JsonResponse &response)

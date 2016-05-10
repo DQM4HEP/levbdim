@@ -51,11 +51,14 @@ public:
   void start(levbdim::fsmmessage* m);
   void kill(levbdim::fsmmessage* m);
   void destroy(levbdim::fsmmessage* m);
+  void registration(levbdim::fsmmessage* m);
+  void registerjob(levbdim::fsmmessage* m);
+  void endregistration(levbdim::fsmmessage* m);
   void status(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void joblog(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void killjob(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void restartjob(Mongoose::Request &request, Mongoose::JsonResponse &response);
-  void registerjob(Mongoose::Request &request, Mongoose::JsonResponse &response);
+
   void registerfile(Mongoose::Request &request, Mongoose::JsonResponse &response);
 protected:
   void startProcess(levbdim::processData* pd);

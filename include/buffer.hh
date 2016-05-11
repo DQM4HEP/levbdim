@@ -93,8 +93,11 @@ namespace levbdim {
     char* ptr(){return _ptr;}
     //! full buffer size
     uint32_t size(){return _psize+3*sizeof(uint32_t)+sizeof(uint64_t);}
+    //! pointer to te payload
     char* payload(){return &_ptr[3*sizeof(uint32_t)+sizeof(uint64_t)];}
+    //! payload size
     uint32_t payloadSize(){return _psize;}
+    //! compress (gzip) the payload (size < 128k)
     void compress()
     {
       unsigned char obuf[0x20000];
@@ -104,6 +107,7 @@ namespace levbdim {
       memcpy(payload(),obuf,ldest);
       _psize=ldest;
     }
+    //! uncompress the payload
     void uncompress()
     {
       unsigned char obuf[0x20000];

@@ -7,7 +7,10 @@
 #include "buffer.hh"
 #include <string>
 namespace levbdim {
-
+  /**
+     \class datasocket
+     \brief It collects data from a specified datasource
+   */
   class datasocket : public DimClient
   {
   public:

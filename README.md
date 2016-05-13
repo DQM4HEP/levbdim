@@ -1,7 +1,7 @@
 # LEVBDIM A Light EVent Builder based on DIM
 ## Introduction
 
-DIM[1] is an acquisition framework developped in the DELPHI experiement. It embeds binary packet exchange in messages published by server and caught by client.
+DIM[1] is an HEP acquisition framework developped in the DELPHI experiement. It embeds binary packet exchange in messages published by server and subscribed by client.
 It is light and TCP/IP based anc can be installed on nearly all currently used OS nowdays.
 
 LEVBDIM is a simple acquisition framework where DIM is used to exchange structured binary buffer. It provides several functionnalities oftenly used in modern data acquisition:
@@ -47,6 +47,9 @@ Two network libraries should be installed. The first one is DIM that can be down
 
 ## Developper's guide
 
+### The event builder
+
+Event building consists of merging various data source that collect event fragment at the same time. Each data source should consequently have a localisation tag and a time tag for each data fragment it provides. This fragment are published by a DimService and is centrally collected to build an event, i.e a collection of data fragment with an identical time tag. 
 ### Data encapsulation and exchange
 
 #### Buffer structure

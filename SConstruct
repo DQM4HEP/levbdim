@@ -42,8 +42,15 @@ def SWIGSharedLibrary(env, library, sources, **args):
 Decider('MD5-timestamp')
 XDAQ_ROOT="/opt/xdaq"
 DHCAL_ROOT=os.path.abspath("..")
-Use_Dim=True
-#os.environ.has_key("DIM_DNS_NODE")
+try:
+  DIM_ROOT=os.environ["DIMDIR"]
+  Use_Dim=True
+except:
+  Use_Dim=False
+if (not Use_Dim):
+  print "Please set DIMDIR"
+  exit(0)
+  #os.environ.has_key("DIM_DNS_NODE")
 fres=os.popen('uname -r')
 kl=fres.readline().split(".")
 
@@ -84,7 +91,7 @@ CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "
 
 
 
-LIBRARIES=['pthread',  'm','dl', 'stdc++','log4cxx','jsoncpp','z','mongoose','curl',boostsystem,boostthread]
+LIBRARIES=['pthread',  'm','dl', 'stdc++','jsoncpp','z','mongoose','curl',boostsystem,boostthread]
 
 
 
@@ -98,9 +105,9 @@ LIBRARY_PATHS.append(commands.getoutput("python -c 'import distutils.sysconfig a
 
 if Use_Dim:
    CPPFLAGS.append("-DUSE_DIM")
-   INCLUDES.append("/opt/dhcal/dim/dim")
+   INCLUDES.append(DIM_ROOT+"/dim")
    LIBRARIES.append("dim")
-   LIBRARY_PATHS.append("/opt/dhcal/dim/linux")
+   LIBRARY_PATHS.append(DIM_ROOT+"/linux")
 
 
 #link flags

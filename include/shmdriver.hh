@@ -12,9 +12,9 @@
 #include <boost/bind.hpp>
 
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
-#define dskey(d,s) ( (s&0xFFF) | ((d &0x1F)<<12))
+#define dskey(d,s) ( (s&0xFFF) | ((d &0xFFF)<<12))
 #define source_id(k) (k&0xFFF)
-#define detector_id(k) ((k>>12)&0x1F)
+#define detector_id(k) ((k>>12)&0xFFF)
 namespace levbdim {
   class shmprocessor
   {

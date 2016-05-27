@@ -129,10 +129,13 @@ void shmdriver::unregisterProcessor(levbdim::shmprocessor* p)
 }
 void shmdriver::registerDataSource(uint32_t det,uint32_t ds)
 {
+  std::cout<<" Registering "<<det<<" "<<ds<<" size "<<_datasources.size()<<" key "<<std::hex<<dskey(det,ds)<<std::dec<<std::endl;
   _datasources.push_back(dskey(det,ds));
 }
 void shmdriver::unregisterDataSource(uint32_t det,uint32_t ds)
 {
+  std::cout<<" UnRegistering "<<det<<" "<<ds<<" size "<<_datasources.size()<<" key "<<std::hex<<dskey(det,ds)<<std::dec<<std::endl;
+
   std::vector<uint32_t>::iterator it=std::find(_datasources.begin(),_datasources.end(),ds);
   if (it!=_datasources.end())
     _datasources.erase(it);
@@ -216,6 +219,7 @@ void shmdriver::start(uint32_t nr)
   // Do the start of the the processors
   _run=nr;
   _evt=0;
+  std::cout<<"run : "<<_run<<" SHMDRIVER START for "<<numberOfDataSource()<<" sources"<<std::endl;
   for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
     {
       (*itp)->start(nr);

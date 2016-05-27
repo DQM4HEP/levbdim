@@ -40,9 +40,11 @@ void datasocket::infoHandler()
 
   _count++;
   DimInfo *curr = getInfo();
-  //std::cout<<"data received "<<curr->getName()<<" "<<curr->getSize()<<std::endl;
+  //std::cout<<"datasocket  received "<<curr->getName()<<" "<<curr->getSize()<<std::endl;
   memcpy(_buffer->ptr(),curr->getData(),curr->getSize());
   _buffer->setPayloadSize(curr->getSize()-3*sizeof(uint32_t)-sizeof(uint64_t));
+
+  std::cout<<"->buffer :"<<_buffer->detectorId()<<" "<<_buffer->dataSourceId()<<" "<<_buffer->eventId()<<" "<<_buffer->bxId()<<" "<<_buffer->size()<<std::endl;
   if (_memdir.size()>4 && _buffer->eventId()!=0)
     levbdim::shmdriver::store(_buffer->detectorId(),_buffer->dataSourceId(),
 			      _buffer->eventId(),_buffer->bxId(),_buffer->ptr(),_buffer->size(),_memdir);

@@ -5,7 +5,7 @@
 
 exServer::exServer(std::string name,uint32_t port) : _running(false),_event(0),_bx(0)
 {
-  _fsm=new fsmweb(name);
+  _fsm=new levbdim::fsmweb(name);
   
   // Register state
   _fsm->addState("CREATED");
@@ -175,21 +175,4 @@ void exServer::list(Mongoose::Request &request, Mongoose::JsonResponse &response
   }
   response["answer"]=array_keys;
 }
-
-#ifdef TEST_MAIN
-int main()
-{
-  exServer s("unessai",45000);
-  while (1)
-  {
-	// For fun, Increment event number 10 times per second to trigger data sending
-	// This is normally done by the hardware
-	s.incrementEvent();
-	::usleep(100000);
-  }
-}
-
-
-
-#endif
 

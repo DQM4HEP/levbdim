@@ -1,16 +1,19 @@
 #include "exServer.hh"
 #include <stdlib.h>
+#include <sstream>
 
 int main()
 {
     uint32_t port=45000;
+	std::stringstream sname;
     char* wp=getenv("WEBPORT");
     if (wp!=NULL)
     {
         port=atoi(wp);	
     }
-    
-    exServer s("unessai",port);	
+    char* hn=getenv("HOSTNAME");
+    sname<<"EXS-"<<hn;
+    exServer s(sname.str(),port);	
     
     while (1)
     {

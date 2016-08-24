@@ -107,7 +107,7 @@ void exServer::readdata(levbdim::datasource *ds)
 void exServer::start(levbdim::fsmmessage* m)
 {
   std::cout<<"Received "<<m->command()<<std::endl;
-  
+  _event=0;
   _running=true;
   
   for (std::vector<levbdim::datasource*>::iterator ids=_sources.begin();ids!=_sources.end();ids++)

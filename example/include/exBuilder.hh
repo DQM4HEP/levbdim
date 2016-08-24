@@ -15,7 +15,7 @@ public:
   void halt(levbdim::fsmmessage* m);
   void list(Mongoose::Request &request, Mongoose::JsonResponse &response);
 private:
-  levbdim::fsmweb* _fsm;
+  fsmweb* _fsm;
   std::vector<levbdim::datasocket*> _sources;
   levbdim::shmdriver* _evb;
   levbdim::basicwriter* _writer;

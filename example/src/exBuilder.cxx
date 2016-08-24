@@ -2,7 +2,7 @@
 
 exBuilder::exBuilder(std::string name,uint32_t port) 
 {
-  _fsm=new levbdim::fsmweb(name);
+  _fsm=new fsmweb(name);
 
   // Register state
   _fsm->addState("CREATED");

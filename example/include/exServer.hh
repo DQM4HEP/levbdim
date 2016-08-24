@@ -15,9 +15,9 @@ public:
   void readdata(levbdim::datasource *ds);
   void download(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void list(Mongoose::Request &request, Mongoose::JsonResponse &response);
-  void incrementEvent() {_event++;_bx++}
+  void incrementEvent() {_event++;_bx++;}
 private:
-  levbdim::fsmweb* _fsm;
+  fsmweb* _fsm;
   std::vector<levbdim::datasource*> _sources;
   std::map<uint32_t,uint32_t> _stat;
   bool _running,_readout;

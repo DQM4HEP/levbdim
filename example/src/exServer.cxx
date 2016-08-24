@@ -5,7 +5,7 @@
 
 exServer::exServer(std::string name,uint32_t port) : _running(false),_event(0),_bx(0)
 {
-  _fsm=new levbdim::fsmweb(name);
+  _fsm=new fsmweb(name);
   
   // Register state
   _fsm->addState("CREATED");
@@ -90,7 +90,7 @@ void exServer::readdata(levbdim::datasource *ds)
 	pld[0]=_event;
 	pld[psi-1]=_event;
 	// Publish the data source
-	ds->publish(_event,bx,psi*sizeof(uint32_t));
+	ds->publish(_event,_bx,psi*sizeof(uint32_t));
 	// Update statistics
 	std::map<uint32_t,uint32_t>::iterator its=_stat.find((ds->buffer()->detectorId()<<16)|ds->buffer()->dataSourceId());
 	if (its!=_stat.end())

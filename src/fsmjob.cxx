@@ -184,9 +184,10 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
     if (jc.isMember("url"))
       {
 	std::string url=jc["url"].asString();
-	//std::cout<<url<<std::endl;
+	std::cout<<url<<std::endl;
+    std::cout<<"Hostname "<<m_hostname<<std::endl;
 	std::string jsconf=wget(url);
-	//std::cout<<jsconf<<std::endl;
+	std::cout<<jsconf<<std::endl;
 	Json::Reader reader;
 	bool parsingSuccessful = reader.parse(jsconf, m_jfile);
 	

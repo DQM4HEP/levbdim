@@ -17,13 +17,12 @@ int main()
 
     sname<<"EXS-"<<hname;
     exServer s(sname.str(),port);	
-    
     while (1)
     {
         // For fun, Increment event number 10 times per second to trigger data sending
         // This is normally done by the hardware
-        
-        s.incrementEvent();
+        if (s.running())
+		  s.incrementEvent();
         ::usleep(100000);
     }
 }

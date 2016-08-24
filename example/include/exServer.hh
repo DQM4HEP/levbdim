@@ -16,6 +16,7 @@ public:
   void download(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void list(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void incrementEvent() {_event++;_bx++;}
+  bool running(){return _running;}
 private:
   fsmweb* _fsm;
   std::vector<levbdim::datasource*> _sources;

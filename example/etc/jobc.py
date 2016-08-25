@@ -161,79 +161,41 @@ grp_action.add_argument('--ljc-job-log',action='store_true',help='log of the pro
 
 
 
-grp_action.add_argument('--srv-configure',action='store_true',help='configure the exServer with --host=name --port=num --det=id --sources=[x,y,z]')
+grp_action.add_argument('--srv-configure',action='store_true',help='configure the exServer with --host=name --port=num --detid=id --sources=[x,y,z]')
 grp_action.add_argument('--srv-start',action='store_true',help='start the exServer with --host=name --port=num')
 grp_action.add_argument('--srv-stop',action='store_true',help='stop the exServer with --host=name --port=num')
+grp_action.add_argument('--srv-status',action='store_true',help='stop the exBuilder with --host=name --port=num')
 grp_action.add_argument('--srv-halt',action='store_true',help='halt the exServer with --host=name --port=num')
 
-grp_action.add_argument('--daq-status',action='store_true',help=' display DAQ status of all DIF')
-grp_action.add_argument('--daq-state',action='store_true',help=' display DAQ state')
-grp_action.add_argument('--daq-evbstatus',action='store_true',help=' display event builder status')
-grp_action.add_argument('--daq-startrun',action='store_true',help=' start the run')
-grp_action.add_argument('--daq-stoprun',action='store_true',help=' stop the run')
-grp_action.add_argument('--trig-status',action='store_true',help=' display trigger counter status')
-grp_action.add_argument('--trig-reset',action='store_true',help=' reset trigger counter')
-grp_action.add_argument('--trig-pause',action='store_true',help=' trigger soft veto')
-grp_action.add_argument('--trig-resume',action='store_true',help=' trigger soft veto release')
-grp_action.add_argument('--ecal-pause',action='store_true',help=' trigger soft veto')
-grp_action.add_argument('--ecal-resume',action='store_true',help=' trigger soft veto release')
-grp_action.add_argument('--trig-spillon',action='store_true',help=' set spill nclock on with --clock=nc (20ns)')
-grp_action.add_argument('--trig-spilloff',action='store_true',help=' set spill nclock off with --clock=nc (20ns) ')
-grp_action.add_argument('--trig-beam',action='store_true',help=' set spill nclock off with --clock=nc (20ns) ')
-grp_action.add_argument('--daq-destroy',action='store_true',help='destroy the DIF readout, back to the PREPARED state')
-grp_action.add_argument('--daq-downloaddb',action='store_true',help='download the dbsate specified in --dbstate=state')
+grp_action.add_argument('--bd-configure',action='store_true',help='configure the exBuilder with --host=name --port=num --memory=path --data=path')
+grp_action.add_argument('--bd-add-sources',action='store_true',help='add sources to the exBuilder --host=name --port=num --det=id --sources=[x,y,z]')
+grp_action.add_argument('--bd-register-done',action='store_true',help='close registration on the exBuilder with --host=name --port=num')
 
-grp_action.add_argument('--daq-dbstatus',action='store_true',help='get current run and state from db')
-grp_action.add_argument('--daq-ctrlreg',action='store_true',help='set the ctrlregister specified with --ctrlreg=register')
+grp_action.add_argument('--bd-start',action='store_true',help='start the exBuilder with --host=name --port=num --run=number')
+grp_action.add_argument('--bd-stop',action='store_true',help='stop the exBuilder with --host=name --port=num')
+grp_action.add_argument('--bd-status',action='store_true',help='status of the exBuilder with --host=name --port=num')
 
-grp_action.add_argument('--slc-create',action='store_true',help='Create the DimSlowControl object to control WIENER crate and BMP sensor')
+grp_action.add_argument('--bd-halt',action='store_true',help='halt the exBuilder with --host=name --port=num')
+grp_action.add_argument('--bd-destroy',action='store_true',help='destroy the exServer with --host=name --port=num')
 
-grp_action.add_argument('--slc-initialisesql',action='store_true',help='initiliase the mysql access specified with --account=login/pwd@host:base')
-
-grp_action.add_argument('--slc-loadreferences',action='store_true',help='load in the wiener crate chambers references voltage download from DB')
-
-grp_action.add_argument('--slc-hvstatus',action='store_true',help='display hvstatus of all channel of the wiener crate')
-
-grp_action.add_argument('--slc-ptstatus',action='store_true',help='display the P and T from the BMP183 readout')
-grp_action.add_argument('--slc-setperiod',action='store_true',help='set the readout period of Wiener and BMP with --period=second(s)')
-
-grp_action.add_argument('--slc-setvoltage',action='store_true',help='set the voltage V of channel i to k with --first=k --last=k --voltage=V')
-grp_action.add_argument('--slc-setcurrent',action='store_true',help='set the current limit I (microA) of channel i to k with --first=k --last=k --current=I')
-grp_action.add_argument('--slc-hvon',action='store_true',help='set the voltage ON  of channel i to k with --first=k --last=k ')
-grp_action.add_argument('--slc-hvoff',action='store_true',help='set the voltage OFF  of channel i to k with --first=k --last=k ')
-grp_action.add_argument('--slc-store',action='store_true',help='start the data storage in the mysql DB at period p  with --period=p ')
-grp_action.add_argument('--slc-store-stop',action='store_true',help='stop the data storage in the mysql DB ')
-grp_action.add_argument('--slc-check',action='store_true',help='start the voltage tuning wrt references at period p  with --period=p ')
-grp_action.add_argument('--slc-check-stop',action='store_true',help='stop the voltage tuning ')
 
 
 
 
 # Arguments
-parser.add_argument('--config', action='store', dest='config',default=None,help='python config file')
-parser.add_argument('--socks', action='store', type=int,dest='sockport',default=None,help='use SOCKS port ')
-parser.add_argument('--dbstate', action='store', default=None,dest='dbstate',help='set the dbstate')
-parser.add_argument('--ctrlreg', action='store', default=None,dest='ctrlreg',help='set the dbstatectrreg in hexa')
-parser.add_argument('--version', action='version', version='%(prog)s 1.0')
-parser.add_argument('--state', action='store', type=str,default=None,dest='fstate',help='set the rpcdaq state')
-parser.add_argument('--channel', action='store',type=int, default=None,dest='channel',help='set the hvchannel')
-parser.add_argument('--first', action='store',type=int, default=None,dest='first',help='set the first hvchannel')
-parser.add_argument('--last', action='store',type=int, default=None,dest='last',help='set the last hvchannel')
-parser.add_argument('--voltage', action='store',type=float, default=None,dest='voltage',help='set the hv voltage')
-parser.add_argument('--current', action='store',type=float, default=None,dest='current',help='set the hv current')
-
-parser.add_argument('--period', action='store',type=int, default=None,dest='period',help='set the tempo period')
-
-parser.add_argument('--clock', action='store',type=int, default=None,dest='clock',help='set the number of 20 ns clock')
-parser.add_argument('--lines', action='store',type=int, default=None,dest='lines',help='set the number of lines to be dump')
-parser.add_argument('--host', action='store', dest='host',default=None,help='host for job control')
 parser.add_argument('--job', action='store', dest='job',default=None,help='job name in job control')
 parser.add_argument('--processname', action='store', dest='processname',default=None,help='job name in job control')
 parser.add_argument('--file', action='store', dest='configjson',default=None,help='remote file name in job control initialise')
 parser.add_argument('--url', action='store', dest='url',default=None,help='remote file name in job control initialise')
 parser.add_argument('--pid', action='store', dest='pid',type=int,default=None,help='job pid in job control')
 parser.add_argument('--signal', action='store', dest='signal',type=int,default=15,help='signal to kill process in job control')
-parser.add_argument('--account', action='store', default=None,dest='account',help='set the mysql account')
+
+parser.add_argument('--host', action='store', dest='host',default=None,help='host of the application')
+parser.add_argument('--port', action='store', type=int,dest='port',default=None,help='port of the application ')
+parser.add_argument('--det', action='store', type=int,dest='detid',default=None,help='detector id ')
+parser.add_argument('--sources', action='store',dest='sources',default=None,help='List of sources id ')
+parser.add_argument('--memory', action='store', type=str,default=None,dest='memorypath',help='memory path')
+parser.add_argument('--data', action='store', type=str,default=None,dest='datapath',help='data path')
 
 parser.add_argument('-v','--verbose',action='store_true',default=False,help='set the mysql account')
 
@@ -242,37 +204,37 @@ results = parser.parse_args()
 #print results
 #exit(0)
 # Analyse results
-if (results.config==None):
-    dc=os.getenv("DAQCONFIG","Not Found")
-    if (dc=="Not Found"):
-        print "please specify a configuration with --config=conf_name"
-        exit(0)
-    else:
-        results.config=dc
+#if (results.config==None):
+    #dc=os.getenv("DAQCONFIG","Not Found")
+    #if (dc=="Not Found"):
+        #print "please specify a configuration with --config=conf_name"
+        #exit(0)
+    #else:
+        #results.config=dc
 
-# import the configuration
-try:
-    exec("import %s  as conf" % results.config)
-except ImportError:
-    raise Exception("cannot import")
+## import the configuration
+#try:
+    #exec("import %s  as conf" % results.config)
+#except ImportError:
+    #raise Exception("cannot import")
 
-# fill parameters 
-p_par={}
+## fill parameters 
+#p_par={}
 
-p_par['dbstate']=conf.dbstate
-p_par['zupdevice']=conf.zupdevice
-p_par['zupport']=conf.zupport
-p_par['filepath']=conf.filepath
-p_par['memorypath']=conf.memorypath
-p_par['proclist']=conf.proclist
-p_par['ctrlreg']=conf.ctrlreg
-p_par['dccname']=conf.dccname
-p_par['mdccname']=conf.mdccname
-p_par['daqhost']=conf.daqhost
-p_par['daqport']=conf.daqport
-p_par['json']=conf.jsonfile
+#p_par['dbstate']=conf.dbstate
+#p_par['zupdevice']=conf.zupdevice
+#p_par['zupport']=conf.zupport
+#p_par['filepath']=conf.filepath
+#p_par['memorypath']=conf.memorypath
+#p_par['proclist']=conf.proclist
+#p_par['ctrlreg']=conf.ctrlreg
+#p_par['dccname']=conf.dccname
+#p_par['mdccname']=conf.mdccname
+#p_par['daqhost']=conf.daqhost
+#p_par['daqport']=conf.daqport
+#p_par['json']=conf.jsonfile
 
-l_par=json.dumps(p_par,sort_keys=True)
+#l_par=json.dumps(p_par,sort_keys=True)
 
 # set the connection mode
 if (results.sockport==None):
@@ -288,52 +250,7 @@ if (results.sockport !=None):
 # analyse the command
 lcgi={}
 r_cmd=None
-if (results.daq_create):
-    r_cmd='createDaq'
-    exit(0)
-
-elif(results.available):
-    r_cmd='available'
-    srd=executeCMD(conf.daqhost,conf.daqport,"WDAQ",None,None)
-    print ">>>>>>>>>>>>>>>> DAQ <<<<<<<<<<<<<<<<<<"
-    parseReturn("state",srd)
-    srs=executeCMD(conf.slowhost,conf.slowport,"WSLOW",None,None)
-    print ">>>>>>>>>>>>>>>> SLOWCONTROL <<<<<<<<<<<<<<<<<<"
-    parseReturn("state",srs)
-    srj=executeCMD(conf.jobhost,conf.jobport,"WJOB",None,None)
-    print ">>>>>>>>>>>>>>>> JOB CONTROL <<<<<<<<<<<<<<<<<<"
-    parseReturn("state",srj)
-    exit(0)
-elif(results.jc_create):
-    r_cmd='createJobControl'
-    lcgi['jsonfile']=conf.jsonfile
-    sr=executeFSM(conf.jobhost,conf.jobport,"WJOB","INITIALISE",lcgi)
-    print sr
-    exit(0)
-elif(results.jc_kill):
-    lcgi.clear();
-    sr=executeFSM(conf.jobhost,conf.jobport,"WJOB","KILL",lcgi)
-    print sr
-    r_cmd='jobKillAll'
-    exit(0)
-elif(results.jc_start):
-    lcgi.clear();
-    sr=executeFSM(conf.jobhost,conf.jobport,"WJOB","START",lcgi)
-    print sr
-    r_cmd='jobStartAll'
-    exit(0)
-elif(results.jc_status):
-    lcgi.clear();
-    sr=executeCMD(conf.jobhost,conf.jobport,"WJOB","STATUS",lcgi)
-    r_cmd='jobStatus'
-    #print "WHAHAHAHA",sr
-    if (results.verbose):
-        print sr
-    else:
-        parseReturn(r_cmd,sr)
-    exit(0)
-
-elif(results.ljc_initialise):
+if(results.ljc_initialise):
     lcgi.clear();
     if (results.host==None):
         print 'Please specify the state --host=name'
@@ -345,7 +262,9 @@ elif(results.ljc_initialise):
         lcgi['file']=results.config;
     elif (results.url!=None):
         lcgi['url']=results.url;
-
+    port=9999
+    if (results.port!=None):
+        port=results.port
     
     #print conf.jsonfile
     sc=json.load(open(conf.jsonfile))

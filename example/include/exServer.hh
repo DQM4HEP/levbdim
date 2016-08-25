@@ -17,8 +17,11 @@ public:
   void list(Mongoose::Request &request, Mongoose::JsonResponse &response);
   void incrementEvent() {_event++;_bx++;}
   bool running(){return _running;}
+  inline void setDetectorId(uint32_t id) {_detid=id;}
+  inline uint32_t getDetectorId() {return _detid;}
 private:
   fsmweb* _fsm;
+  uint32_t _detid;
   std::vector<levbdim::datasource*> _sources;
   std::map<uint32_t,uint32_t> _stat;
   bool _running,_readout;

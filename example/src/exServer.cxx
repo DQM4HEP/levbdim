@@ -3,7 +3,7 @@
 #include <sstream>
 
 
-exServer::exServer(std::string name,uint32_t port) : _running(false),_event(0),_bx(0)
+exServer::exServer(std::string name,uint32_t port) : _running(false),_detid(0),_event(0),_bx(0)
 {
   _fsm=new fsmweb(name);
   
@@ -173,6 +173,8 @@ void exServer::list(Mongoose::Request &request, Mongoose::JsonResponse &response
 	js["event"]=it->second;
 	array_keys.append(js);
   }
-  response["answer"]=array_keys;
+    response["answer"]["detector"]=_detid;
+    response["answer"]["dataSources"]=array_keys;
+
 }
 

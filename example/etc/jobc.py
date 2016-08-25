@@ -136,8 +136,59 @@ def executeCMD(host,port,prefix,cmd,params):
        r1=urllib2.urlopen(req)
        return r1.read()
     
+class levProcess:
+    """
+    Handle all application definition and parameters
+    """
+    
+    def Dump(self):
+        """
+        Print parameters info
+        """
+        print self.host,self.port,self.prefix
+        for pname,vpar in sorted(self.params.iteritems()):
+            print "params[",pname,"]=",vpar
+
+    def sendTransition(self,cmd,params=self.params):
+        self.rc=executeFSM(self.host,self.port,self.prefix,cmd,params):
+
+    def sendCommand(self,cmd,params=self.params):
+ 
+        self.rc=executeCMD(self.host,self.port,self.prefix,cmd,params):
 
 
+
+    def setParameter(self,pname,pval):
+        """
+        Change internal parameter pname to pval value (both are strings)
+        """
+        self.params[pname]=pval
+
+    def getParameter(self, pname):
+        """
+        get the stored value of the parameter pname
+        """
+        return self.params[pname]
+
+    def clear(self):
+        self.params.clear()
+
+    def __init__(self,host,port,prefix):
+        """
+        Constructor
+        """
+        self.host=host
+        self.port=port
+        self.prefix=prefix
+        self.params={}
+
+class exServer(levProcess):
+    def __init__(self,host,port,detid,sources):
+        prf="EXS-"+host
+        levProcess.__init__(self,host,port,prf)
+        self.clear()
+        self.setParameter("detid",detid)
+        self.setParameter("sourceid",sources)
 
 
 

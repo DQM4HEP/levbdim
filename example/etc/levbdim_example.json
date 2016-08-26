@@ -5,7 +5,7 @@
 	"lyosdhcal10":[
 	    {
 		"NAME":"EXSERVER",
-		"ARGS" : ["-d 110"],
+		"ARGS" : ["-d 110","-p 46000"],
 		"ENV" : [
 		    "DIM_DNS_NODE=lyopc252",
 		    "LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/opt/dhcal/levbdim/lib:/opt/dhcal/levbdim/example/lib:/opt/dhcal/dim/linux:$LD_LIBRARY_PATH"
@@ -16,7 +16,7 @@
 	"lyosdhcal12":[
 	    {
 		"NAME":"EXSERVER",
-		"ARGS" : ["-d 112"],
+		"ARGS" : ["-d 112","-p 46000"],
 		"ENV" : [
 		    "DIM_DNS_NODE=lyopc252",
 		    "LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/opt/dhcal/levbdim/lib:/opt/dhcal/levbdim/example/lib:/opt/dhcal/dim/linux:$LD_LIBRARY_PATH"
@@ -27,7 +27,7 @@
 	"lyosdhcal7":[
 	    {
 		"NAME":"EXSERVER",
-		"ARGS" : ["-d 107"],
+		"ARGS" : ["-d 107","-p 46000"],
 		"ENV" : [
 		    "DIM_DNS_NODE=lyopc252",
 		    "LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/opt/dhcal/levbdim/lib:/opt/dhcal/levbdim/example/lib:/opt/dhcal/dim/linux:$LD_LIBRARY_PATH"
@@ -40,7 +40,7 @@
 	    
 	    {
 		"NAME":"EXBUILDER",
-		"ARGS" : [],
+		"ARGS" : [,"-p 45000"],
 		"ENV" : [
 		    "DIM_DNS_NODE=lyopc252",
 		    "LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/opt/dhcal/levbdim/lib:/opt/dhcal/levbdim/example/lib:/opt/dhcal/dim/linux:$LD_LIBRARY_PATH"
@@ -51,8 +51,11 @@
     },
     "HARDWARE" :
     {
-    "107":[123,234,55,77,88],
-    "110":[12,13,14,15,212,214,213,254],
-    "112":[23,24,26,78,79,80,91,92,88,99,199,188,189]
+        "EXSERVER":[
+            { "host":"lyosdhcal7","port":46000,"detid":107,"sources":[123,234,55,77,88]},
+            { "host":"lyosdhcal10","port":46000,"detid":110,"sources":[12,13,14,15,212,214,213,254]},
+            { "host":"lyosdhcal12","port":46000,"detid":112,"sources":[23,24,26,78,79,80,91,92,88,99,199,188,189]}
+        ],
+        "EXBUILDER":{"host":"lyopc252","port":45000,"mempath":"/dev/shm/levbdim","datapath":"/tmp"}
     }
 }

@@ -10,7 +10,7 @@ DEAMON_NAME="ljc" #Nom du programme (doit être identique à l'exécutable)
 PATH="/sbin:/bin:/usr/sbin:/usr/bin" #Ne pas toucher
 
 
-export DIM_DNS_NODE=lyosdhcal9
+export DIM_DNS_NODE=lyopc252
 export DIMDIR=/opt/dhcal/dim
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/opt/dhcal/levbdim/lib:/opt/dhcal/lib:${DIMDIR}/linux:$LD_LIBRARY_PATH
 

@@ -76,9 +76,10 @@ void exServer::readdata(levbdim::datasource *ds)
   {
 	::usleep(10000);
 	if (!_running) break;
-	if (_event%100==0)
-	  std::cout<<"Thread of "<<ds->buffer()->dataSourceId()<<" is running "<<_event<<" "<<_running<<std::endl;
 	if (_event == last_evt) continue;
+	if (_event%100==0)
+	  std::cout<<"Thread of "<<ds->buffer()->dataSourceId()<<" is running "<<_event<<" events and status is "<<_running<<std::endl;
+
 	// Just fun 
 	// Create a dummy buffer of fix length depending on source id and random data
 	// 

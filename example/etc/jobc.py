@@ -137,27 +137,18 @@ def executeCMD(host,port,prefix,cmd,params):
        return r1.read()
     
 class levProcess:
-    """
-    Handle all application definition and parameters
-    """
-    
+    ' handling '
     def Dump(self):
-        """
-        Print parameters info
-        """
         print self.host,self.port,self.prefix
         for pname,vpar in sorted(self.params.iteritems()):
             print "params[",pname,"]=",vpar
-
-    def sendTransition(self,cmd,params=self.params):
-        self.rc=executeFSM(self.host,self.port,self.prefix,cmd,params):
-
-    def sendCommand(self,cmd,params=self.params):
- 
-        self.rc=executeCMD(self.host,self.port,self.prefix,cmd,params):
-
-
-
+            
+    def sendTransition(self,cmd):
+        self.rc=executeFSM(self.host,self.port,self.prefix,cmd,self.params)
+        return self.rc
+    def sendCommand(self,cmd):
+        self.rc=executeCMD(self.host,self.port,self.prefix,cmd,self.params)
+        return self.rc
     def setParameter(self,pname,pval):
         """
         Change internal parameter pname to pval value (both are strings)
@@ -214,9 +205,11 @@ class exSetup:
             print "Cannot retrieve file ",self.jfile,e
             return 
         else:
-            self.json=json.loads(r1.read())
+            sfile=r1.read();
+            #print sfile
+            self.json=json.loads(sfile)
         # EXSERVERS
-        x=self.json["HARDWARE"]:
+        x=self.json["HARDWARE"]
         for sv in x["EXSERVER"]:
             exs=exServer(sv["host"],sv["port"],sv["detid"],sv["sources"])
             self.servers.append(exs)
@@ -253,7 +246,7 @@ class exSetup:
         lcgi={}
         #lcgi['url']=self.jfile
         for  x,y in self.json["HOSTS"].iteritems():
-            sr=executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi)
+            sr=json.loads(executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi))
             print x
             print sr
 
@@ -266,8 +259,8 @@ class exSetup:
         for  x,y in self.json["HOSTS"].iteritems():
             if (x!=host):
                 continue;
-            sr=executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi)
-            for p in sr:
+            sr=json.loads(executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi))
+            for p in sr['answer']['JOBS']:
                 if (p['NAME']==name):
                     pid=p['PID']
                     lcgi['pid']=pid
@@ -284,8 +277,8 @@ class exSetup:
         for  x,y in self.json["HOSTS"].iteritems():
             if (x!=host):
                 continue;
-            sr=executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi)
-            for p in sr:
+            sr=json.loads(executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi))
+            for p in sr['answer']['JOBS']:
                 if (p['NAME']==name):
                     pid=p['PID']
                     lcgi['pid']=pid
@@ -302,17 +295,52 @@ class exSetup:
         for  x,y in self.json["HOSTS"].iteritems():
             if (x!=host):
                 continue;
-            sr=executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi)
-            for p in sr:
+            srs=executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi)
+            sr=json.loads(srs)
+            #print sr
+            for p in sr['answer']['JOBS']:
                 if (p['NAME']==name):
                     pid=p['PID']
                     lcgi['pid']=pid
                     lcgi['processname']=name
                     lcgi['lines']=lines
-                    sr=executeCMD(x,9999,"LJC-%s" % x,"JOBLOG",lcgi)
-                    print sr['FILES']
-                    print sr['LINES']
+                    lrs=executeCMD(x,9999,"LJC-%s" % x,"JOBLOG",lcgi)
+                    #print lrs
+                    lr=json.loads(lrs)
+                    #print lr
+                    print lr['answer']['FILE']
+                    print lr['answer']['LINES']
                     return
+    def configure(self):
+        if (self.json==None):
+            print "No json file parsed"
+            return
+        for x in self.servers:
+            x.sendTransition("CONFIGURE")
+        self.builder.sendTransition("CONFIGURE")
+        # Now add sources to the builder
+        x=self.json["HARDWARE"]
+        for sv in x["EXSERVER"]:
+            self.builder.setParameter("detid",sv["detid"])
+            self.builder.setParameter("sourceid",sv["sources"])
+            self.builder.sendTransition("ADDSOURCES")
+        self.builder.sendTransition("REGISTER")
+    def start(self,run):
+        if (self.json==None):
+            print "No json file parsed"
+            return
+        self.builder.setParameter("run",run)
+        self.builder.sendTransition("START")
+        for x in self.servers:
+            x.sendTransition("START")
+    def stop(self):
+        for x in self.servers:
+            x.sendTransition("STOP")
+        self.builder.sendTransition("STOP")
+    def status(self):
+        print self.builder.sendCommand("LIST")
+        for x in self.servers:
+            print x.sendCommand("LIST")
 
 #parser = argparse.ArgumentParser()
 

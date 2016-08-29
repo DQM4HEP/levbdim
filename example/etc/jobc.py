@@ -10,47 +10,23 @@ import time
 import argparse
 
 def parseReturn(command,sr):
-    if (command=="jobStatus"):
-        #s=r1.read()
-        #print s["answer"]
-        sj=json.loads(sr)
-        #sj=s
-        #ssj=json.loads(sj["answer"]["ANSWER"])
-        ssj=sj["answer"]["ANSWER"]
+    """ Parsing the command return.
+    Args:
+    command: command name
+    sr: the return lines (in json or string format)
+    """
+    if (command=="statusJobs"):
         print "\033[1m %6s %15s %25s %20s \033[0m" % ('PID','NAME','HOST','STATUS')
-        for x in ssj:
-            if (x['DAQ']=='Y'):
-                print "%6d %15s %25s %20s" % (x['PID'],x['NAME'],x['HOST'],x['STATUS'])
-    if (command=="hvStatus"):
-        sj=json.loads(sr)
-        ssj=sj["answer"]["ANSWER"]
-        #print ssj
-        print "\033[1m %5s %10s %10s %10s %10s \033[0m" % ('Chan','VSET','ISET','VOUT','IOUT')
-        for x in ssj:
-            print "#%.4d %10.2f %10.2f %10.2f %10.2f" % (x['channel'],x['vset'],x['iset'],x['vout'],x['iout'])
-    if (command=="LVStatus"):
-        sj=json.loads(sr)
-        
-        ssj=sj["answer"]["LVSTATUS"]
-        print "\033[1m %10s %10s %10s \033[0m" % ('VSET','VOUT','IOUT')
-        print " %10.2f %10.2f %10.2f" % (ssj['vset'],ssj['vout'],ssj['iout'])
-    if (command=="status" and not results.verbose):
-
-        sj=json.loads(sr)
-        ssj=sj["answer"]["diflist"]
-        print "\033[1m %4s %5s %6s %12s %12s %15s  %s \033[0m" % ('DIF','SLC','EVENT','BCID','BYTES','SERVER','STATUS')
+        for x in sr['JOBS']:
+            print "%6d %15s %25s %20s" % (x['PID'],x['NAME'],x['HOST'],x['STATUS'])
+    if (command=="status" ):
+        ssj=sr["answer"]["answer"]["dataSources"]
+        print "\033[1m %12s %12s %12s \033[0m" % ('DetID','SourceId','EVENT')
 
         for d in ssj:
-            #print d
-            #for d in x["difs"]:
-            print '#%4d %5x %6d %12d %12d %15s %s ' % (d["id"],d["slc"],d["gtc"],d["bcid"],d["bytes"],d["host"],d["state"])
-    if (command=="dbStatus" ):
-        sj=json.loads(sr)
-        ssj=sj["answer"]
-        print "\033[1m %10s %10s \033[0m" % ('Run','State')
-        print " %10d %s " % (ssj['run'],ssj['state'])
-    if (command=="shmStatus" ):
-        sj=json.loads(sr)
+            print '#%12d %12d %12d  ' % (d["detid"],d["sourceid"],d["event"])
+    if (command=="builderStatus" ):
+        sj=sr['answer']
         ssj=sj["answer"]
         print "\033[1m %10s %10s \033[0m" % ('Run','Event')
         print " %10d %10d " % (ssj['run'],ssj['event'])
@@ -66,57 +42,61 @@ def parseReturn(command,sr):
 
         print "\033[1m Commands \033[0m :",scm
         print "\033[1m F S M \033[0m :",scf
-    if (command=="triggerStatus"):
-          
-        sj=json.loads(sr)
-        ssj=sj["answer"]["COUNTERS"]
-        print "\033[1m %10s %10s %10s %10s %12s %12s %10s %10s %10s \033[0m" % ('Spill','Busy1','Busy2','Busy3','SpillOn','SpillOff','Beam','Mask','EcalMask')
-        print " %10d %10d %10d %10d  %12d %12d %12d %10d %10d " % (ssj['spill'],ssj['busy1'],ssj['busy2'],ssj['busy3'],ssj['spillon'],ssj['spilloff'],ssj['beam'],ssj['mask'],ssj['ecalmask'])
-    if (command=="difLog" or command=="cccLog" or command=="mdccLog" or command =="zupLog" or command=="jobLog"):
-          
-        sj=json.loads(sr)
-        print  "\033[1m %s \033[0m" % sj["answer"]["FILE"]
-        ssj=sj["answer"]["LINES"]
+    if (command=="jobLog"):   
+        print  "\033[1m %s \033[0m" % sr["answer"]["FILE"]
+        ssj=sr["answer"]["LINES"]
         print ssj
-        #print "\033[1m %10s %10s %10s %10s %12s %12s %10s %10s %10s \033[0m" % ('Spill','Busy1','Busy2','Busy3','SpillOn','SpillOff','Beam','Mask','EcalMask')
-        #print " %10d %10d %10d %10d  %12d %12d %12d %10d %10d " % (ssj['spill'],ssj['busy1'],ssj['busy2'],ssj['busy3'],ssj['spillon'],ssj['spilloff'],ssj['beam'],ssj['mask'],ssj['ecalmask'])
-
-        
+ 
+def discover(host,port):
+   """ Dump the page of a fsmweb  http://host:port.
+   Args:
+    host: hostname
+    port: port of the fsmweb
+   """
+   myurl = "http://"+host+ ":%d" % (port)
+   req=urllib2.Request(myurl)
+   r1=urllib2.urlopen(req)
+   return r1.read()
+ 
 def executeFSM(host,port,prefix,cmd,params):
+   """ Call an fsmweb transition
+   Args:
+    host: hostname
+    port: port of the fsmweb
+    prefix: the fsmweb url prefix
+    cmd: the transition name
+    params: array of parameters to be encoded in the content field
+   Returns:
+    the json encoded page or None 
+   """
    if (params!=None):
        myurl = "http://"+host+ ":%d" % (port)
-       #conn = httplib.HTTPConnection(myurl)
-       #if (name!=None):
-       #    lq['name']=name
-       #if (value!=None):
-       #    lq['value']=value
-       myurl = "http://"+host+ ":%d" % (port)
-       #conn = httplib.HTTPConnection(myurl)
-       lq={}
-       
+       lq={} 
        lq["content"]=json.dumps(params,sort_keys=True)
-       #for x,y in params.iteritems():
-       #    lq["content"][x]=y
        lq["command"]=cmd           
        lqs=urllib.urlencode(lq)
-       #print lqs
        saction = '/%s/FSM?%s' % (prefix,lqs)
        myurl=myurl+saction
        #print myurl
        req=urllib2.Request(myurl)
        r1=urllib2.urlopen(req)
        return r1.read()
+     else:
+       return None
 
 def executeCMD(host,port,prefix,cmd,params):
+   """ Call an fsmweb command.
+   Args:
+    host: hostname
+    port: port of the fsmweb
+    prefix: the fsmweb url prefix
+    cmd: the command name
+    params: array of parameters to be encoded in the url
+   Returns:
+    the json encoded page or None 
+   """
    if (params!=None and cmd!=None):
        myurl = "http://"+host+ ":%d" % (port)
-       #conn = httplib.HTTPConnection(myurl)
-       #if (name!=None):
-       #    lq['name']=name
-       #if (value!=None):
-       #    lq['value']=value
-       myurl = "http://"+host+ ":%d" % (port)
-       #conn = httplib.HTTPConnection(myurl)
        lq={}
        lq["name"]=cmd
        for x,y in params.iteritems():
@@ -137,12 +117,17 @@ def executeCMD(host,port,prefix,cmd,params):
        return r1.read()
     
 class levProcess:
-    ' handling '
+    """ Class handling fsmweb interactions.
+    """
     def Dump(self):
+        " Print object info"
         print self.host,self.port,self.prefix
         for pname,vpar in sorted(self.params.iteritems()):
             print "params[",pname,"]=",vpar
-            
+    def discover(self):
+        " Print Process capabilities"
+        print "\033[1m levProcess: http://%s:%d \033[0m" % (self.host,self.port)
+        parseReturn("state",discover(self.host,self.port))
     def sendTransition(self,cmd):
         self.rc=executeFSM(self.host,self.port,self.prefix,cmd,self.params)
         return self.rc
@@ -247,8 +232,8 @@ class exSetup:
         #lcgi['url']=self.jfile
         for  x,y in self.json["HOSTS"].iteritems():
             sr=json.loads(executeCMD(x,9999,"LJC-%s" % x,"STATUS",lcgi))
-            print x
-            print sr
+            print "Worker :",x
+            parseReturn('statusJobs',sr['answer'])
 
     def restartJob(self,host,name):
         if (self.json==None):
@@ -307,9 +292,10 @@ class exSetup:
                     lrs=executeCMD(x,9999,"LJC-%s" % x,"JOBLOG",lcgi)
                     #print lrs
                     lr=json.loads(lrs)
+                    parseReturn('jobLog',lr)
                     #print lr
-                    print lr['answer']['FILE']
-                    print lr['answer']['LINES']
+                    #print lr['answer']['FILE']
+                    #print lr['answer']['LINES']
                     return
     def configure(self):
         if (self.json==None):
@@ -337,10 +323,14 @@ class exSetup:
         for x in self.servers:
             x.sendTransition("STOP")
         self.builder.sendTransition("STOP")
-    def status(self):
-        print self.builder.sendCommand("LIST")
+    def state(self):
         for x in self.servers:
-            print x.sendCommand("LIST")
+            x.discover()
+        self.builder.discover()
+    def status(self):
+        parseReturn("builderStatus",json.loads(self.builder.sendCommand("LIST")))
+        for x in self.servers:
+            parseReturn("status",json.loads(x.sendCommand("LIST")))
 
 #parser = argparse.ArgumentParser()
 

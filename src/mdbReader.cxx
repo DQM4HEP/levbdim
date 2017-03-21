@@ -5,7 +5,9 @@
   void mdbReader::connect()
   {
     mongo::HostAndPort hp(_host,_port);
-    _cl.connect(hp);
+    
+    std::string errmsg;
+    _cl.connect(hp,errmsg);
   }
   std::vector<std::pair<std::string,uint32_t> > mdbReader::listDaqConfig(std::string coll)
   {
@@ -20,7 +22,15 @@
 	BSONObj b=cursor->next();
 	mongo::OID theid=b["_id"].OID();
 	//cout<<theid.asTimeT()<<endl;
-	uint8_t* bb=(uint8_t*)theid.getData();
+	
+	uint8_t bb[12];
+	for (int i=0;i<12;i++) 
+	  {
+	    int val;
+	    sscanf(theid.toString().substr(i*2,2).c_str(),"%x",&val);
+	    bb[i]=val&0XFF;
+	    
+	  }
 	uint32_t cnt=bb[11]|(bb[10]<<8)|(bb[9]<<16);
 	//cout<<hex<<cnt<<dec<<" "<<cnt<<" "<<theid.toString()<<endl;
 
@@ -52,7 +62,16 @@
 	BSONObj b=cursor->next();
 	mongo::OID theid=b["_id"].OID();
 	//cout<<theid.asTimeT()<<endl;
-	uint8_t* bb=(uint8_t*)theid.getData();
+
+		
+	uint8_t bb[12];
+	for (int i=0;i<12;i++) 
+	  {
+	    int val;
+	    sscanf(theid.toString().substr(i*2,2).c_str(),"%x",&val);
+	    bb[i]=val&0XFF;
+	    
+	  }
 	uint32_t cnt=bb[11]|(bb[10]<<8)|(bb[9]<<16);
 	//cout<<hex<<cnt<<dec<<" "<<cnt<<" "<<theid.toString()<<endl;
 

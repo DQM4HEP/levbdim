@@ -14,6 +14,8 @@ export DIM_DNS_NODE=lyopc252
 export DIMDIR=/opt/dhcal/dim
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/opt/dhcal/levbdim/lib:/opt/dhcal/lib:${DIMDIR}/linux:$LD_LIBRARY_PATH
 
+. /etc/difdim.cfg
+
 test -x $DAEMON || exit 0
 
 . /lib/lsb/init-functions

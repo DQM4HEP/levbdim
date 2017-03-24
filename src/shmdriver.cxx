@@ -162,7 +162,7 @@ void shmdriver::processEvent(uint32_t idx)
   if (it->second.size()!=numberOfDataSource()) return;
   if (it->first==0) return; // do not process event 0
   _evt=it->first;
-  std::cout<<"full  event find " <<it->first<<std::endl;
+  //std::cout<<"full  event find " <<it->first<<std::endl;
   for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
     {
       (*itp)->processEvent(it->first,it->second);

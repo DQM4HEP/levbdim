@@ -1,3 +1,5 @@
+#ifndef _levbdimFsmweb_hh
+#define _levbdimFsmweb_hh
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -45,3 +47,4 @@ private:
 };
 
 
+#endif

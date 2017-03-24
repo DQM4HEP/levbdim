@@ -184,9 +184,10 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
     if (jc.isMember("url"))
       {
 	std::string url=jc["url"].asString();
-	//std::cout<<url<<std::endl;
+	std::cout<<url<<std::endl;
+    std::cout<<"Hostname "<<m_hostname<<std::endl;
 	std::string jsconf=wget(url);
-	//std::cout<<jsconf<<std::endl;
+	std::cout<<jsconf<<std::endl;
 	Json::Reader reader;
 	bool parsingSuccessful = reader.parse(jsconf, m_jfile);
 	
@@ -209,6 +210,7 @@ void fsmjob::startProcess(levbdim::processData* pProcessData)
     return;
 
   std::string programName = pProcessData->m_processInfo["PROGRAM"].asString();
+  std::string processName = pProcessData->m_processInfo["NAME"].asString();
   std::vector<std::string> arguments;
   std::vector<std::string> environmentVars;
   
@@ -279,6 +281,11 @@ void fsmjob::startProcess(levbdim::processData* pProcessData)
       i++;
     }
 
+    std::stringstream ss;
+    ss<<"PROCESSNAME="<<processName;
+    sprintf(envp[i],"%s",ss.str().c_str());
+    pEnvp[i]=&envp[i][0];
+    i++;
   pEnvp[i] = NULL;
   
   // set new user id to root

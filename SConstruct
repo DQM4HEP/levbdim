@@ -85,15 +85,19 @@ INCLUDES=['include',"/usr/include/boost141/","/usr/include/jsoncpp","/usr/local/
 
 INCLUDES.append(commands.getoutput("python -c 'import distutils.sysconfig as conf; print conf.get_python_inc()'"))
 
-CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "-DXERCES=2", "-DDAQ_VERSION_2"]
+CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "-DXERCES=2", "-DDAQ_VERSION_2","-std=c++11"]
 
+if  Arm:
+  INCLUDES.append("/opt/mongo/include") 
 #Library ROOT + some of XDAQ + DB 
 
 
 
-LIBRARIES=['pthread',  'm','dl', 'stdc++','jsoncpp','z','mongoose','curl',boostsystem,boostthread]
+LIBRARIES=['pthread',  'm','dl', 'stdc++','jsoncpp','z','mongoose','curl',"boost_filesystem","mongoclient","ssl",boostsystem,boostthread]
 
-
+if  Arm:
+  LIBRARIES.append("boost_regex")
+  LIBRARIES.append("rt")
 
 #Library path XDAQ,DHCAL and ROOT + Python
 if (Bit64):
@@ -101,6 +105,10 @@ if (Bit64):
 else:
   LIBRARY_PATHS=["/usr/lib","/usr/local/lib","/usr/lib/boost141"]
 LIBRARY_PATHS.append(commands.getoutput("python -c 'import distutils.sysconfig as conf; print conf.PREFIX'")+"/lib")
+
+if  Arm:
+  LIBRARY_PATHS.append("/opt/mongo/lib")
+
 
 
 if Use_Dim:

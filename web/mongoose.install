@@ -5,7 +5,7 @@ mkdir build/
 cd build/
 rm -rf *
 cp /opt/dhcal/levbdim/web/CMakeLists.txt  ../
-cmake -DEXAMPLES=ON -DWEBSOCKET=ON  -DHAS_JSONCPP=ON ..
+cmake -DEXAMPLES=ON -DWEBSOCKET=OFF  -DHAS_JSONCPP=ON ..
 make -j4
 sudo make install
 

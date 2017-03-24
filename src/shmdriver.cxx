@@ -262,8 +262,8 @@ void shmdriver::scanMemory()
 	    }
 	  if (it_gtc->second.size()==this->numberOfDataSource())
 	    {
-	      if (it_gtc->first%100==0)
-		printf("GTC %lu %lu  %d\n",it_gtc->first,it_gtc->second.size(),this->numberOfDataSource());
+	      //if (it_gtc->first%100==0)
+	      printf("GTC %lu %lu  %d\n",it_gtc->first,it_gtc->second.size(),this->numberOfDataSource());
 	      this->processEvent(idx_storage);
 	    }
 	}

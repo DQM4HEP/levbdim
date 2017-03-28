@@ -1,6 +1,9 @@
 #include "fsmweb.hh"
 #include <iostream>
 #include <sstream>
+#include <sys/types.h>
+#include <unistd.h>
+
 fsmweb::fsmweb(std::string name) : levbdim::fsm(name),_running(false),_name(name),_webState(NULL)
 {
   _commands.clear();
@@ -155,6 +158,7 @@ void FSMMongo::List(Request &request, JsonResponse &response)
   response["FSM"]=_fsm->transitionsList();
   response["CMD"]=_fsm->commandsList();
   response["STATE"]=_fsm->state();
+  response["PID"]=getpid();
 }
 
 void FSMMongo::setup()

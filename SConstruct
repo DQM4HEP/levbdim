@@ -89,6 +89,7 @@ CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "
 
 if  Arm:
   INCLUDES.append("/opt/mongo/include") 
+INCLUDES.append("/opt/mongo/include") 
 #Library ROOT + some of XDAQ + DB 
 
 
@@ -98,6 +99,8 @@ LIBRARIES=['pthread',  'm','dl', 'stdc++','jsoncpp','z','mongoose','curl',"boost
 if  Arm:
   LIBRARIES.append("boost_regex")
   LIBRARIES.append("rt")
+LIBRARIES.append("boost_regex")
+LIBRARIES.append("rt")
 
 #Library path XDAQ,DHCAL and ROOT + Python
 if (Bit64):
@@ -109,6 +112,7 @@ LIBRARY_PATHS.append(commands.getoutput("python -c 'import distutils.sysconfig a
 if  Arm:
   LIBRARY_PATHS.append("/opt/mongo/lib")
 
+LIBRARY_PATHS.append("/opt/mongo/lib")
 
 
 if Use_Dim:

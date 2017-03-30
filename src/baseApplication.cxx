@@ -35,6 +35,18 @@ baseApplication::baseApplication(std::string name)
     _processName=pname;
   else
     _processName="UNKNOWN";
+
+  // Find the instance
+  _instance=0;
+ 
+  char* wi=getenv("INSTANCE");
+  if (wi!=NULL) _instance=atoi(wi);
+  // Find the port
+  _port=0;
+ 
+  char* wp=getenv("WEBPORT");
+  if (wp!=NULL) _port=atoi(wp);
+  
   _jConfig=Json::Value::null;
   _jParam=Json::Value::null;
 }
@@ -110,6 +122,28 @@ void  baseApplication::create(levbdim::fsmmessage* m)
       {
         if (b["NAME"].asString().compare(_processName)==0)
         {
+	  uint32_t port=0,instance=0;
+	  if (b.isMember("ENV"))
+	    {
+	      const Json::Value& jenv=b["ENV"];
+
+	      for (Json::ValueConstIterator ie = jenv.begin(); ie != jenv.end(); ++ie)
+		{
+		  std::string envp=(*ie).asString();
+              //      std::cout<<"Env found "<<envp.substr(0,7)<<std::endl;
+              //std::cout<<"Env found "<<envp.substr(8,envp.length()-7)<<std::endl;
+		  if (envp.substr(0,7).compare("WEBPORT")==0)
+		    {
+		      port=atol(envp.substr(8,envp.length()-7).c_str());
+		    }
+		  if (envp.substr(0,8).compare("INSTANCE")==0)
+		    {
+		      instance=atol(envp.substr(9,envp.length()-8).c_str());
+		    }
+
+		}
+	    }
+	    if (port!=_port || instance!=_instance) continue;
           if (b.isMember("PARAMETER")) 
           {
             _jParam=b["PARAMETER"];

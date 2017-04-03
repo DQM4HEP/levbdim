@@ -15,7 +15,7 @@ public:
   void c_setparameter(Mongoose::Request &request, Mongoose::JsonResponse &response);
   virtual void  userCreate(levbdim::fsmmessage* m);
   Json::Value configuration();
-  Json::Value parameters();
+  Json::Value& parameters();
   fsmweb* fsm();
   uint32_t instance(){return _instance;}
   uint32_t port(){return _port;}

@@ -199,5 +199,5 @@ void baseApplication::c_setparameter(Mongoose::Request &request, Mongoose::JsonR
 }
 void  baseApplication::userCreate(levbdim::fsmmessage* m) {;}
 Json::Value baseApplication::configuration() { return _jConfig;}
-Json::Value baseApplication::parameters() {return _jParam;}
+Json::Value& baseApplication::parameters() {return _jParam;}
 fsmweb* baseApplication::fsm(){return _fsm;}

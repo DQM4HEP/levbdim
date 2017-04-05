@@ -22,6 +22,7 @@ namespace levbdim {
     virtual void start(uint32_t run)=0;
     virtual void stop()=0;
     virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss)=0;
+    virtual  void processRunHeader(std::vector<uint32_t> header)=0;
   };
 
   class shmdriver 
@@ -46,6 +47,8 @@ namespace levbdim {
     void scanMemory();
     void processEvents();
     void processEvent(uint32_t id);
+    void processRunHeader();
+    std::vector<uint32_t>& runHeader(){return _runHeader;}
     void stop();
     
     static void purgeShm(std::string memdir);
@@ -70,6 +73,7 @@ namespace levbdim {
     boost::thread_group _gThread;
     bool _running;
     uint32_t _run,_evt;
+    std::vector<uint32_t> _runHeader;
   };
 };
 #endif

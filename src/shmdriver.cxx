@@ -176,7 +176,13 @@ void shmdriver::processEvent(uint32_t idx)
 
   
 }
-
+void shmdriver::processRunHeader()
+{
+  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
+    {
+      (*itp)->processRunHeader(_runHeader);
+    }
+}
 void shmdriver::processEvents()
 {
   while (_running)

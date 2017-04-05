@@ -20,6 +20,8 @@ namespace levbdim {
     virtual void start(uint32_t run);
     virtual void stop();
     virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss);
+    virtual  void processRunHeader(std::vector<uint32_t> header);
+    
     uint32_t totalSize();
     uint32_t eventNumber();
     uint32_t runNumber();

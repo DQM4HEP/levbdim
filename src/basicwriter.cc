@@ -52,6 +52,30 @@ void basicwriter::stop()
 uint32_t basicwriter::totalSize(){return _totalSize;}
 uint32_t basicwriter::eventNumber(){return _event;}
 uint32_t basicwriter::runNumber(){return _run;}
+void basicwriter::processRunHeader(std::vector<uint32_t> header)
+{
+  if (_fdOut>0 && header.size()<256)
+    {
+      uint32_t ibuf[256];
+      for (int i=0;i<header.size();i++) ibuf[i]=header[i];
+      int ier=write(_fdOut,&_run,sizeof(uint32_t));
+      int nb=1;
+      ier=write(_fdOut,&nb,sizeof(uint32_t));
+      // Construct one levbdim buffer with header content
+      levbdim::buffer b(128+header.size());
+      b.setDetectorId(255);
+      b.setDataSourceId(1);
+      b.setEventId(0);
+      b.setBxId(0);
+      b.setPayload(ibuf,header.size()*sizeof(uint32_t));
+      b.compress();
+      uint32_t bsize=b.size();
+      _totalSize+=bsize;
+      ier=write(_fdOut,&bsize,sizeof(uint32_t));
+      ier=write(_fdOut,b.ptr(),bsize);
+    }
+                
+}
 void basicwriter::processEvent(uint32_t key,std::vector<levbdim::buffer*> vbuf)
 {
 

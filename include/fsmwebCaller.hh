@@ -87,7 +87,7 @@ public:
 
   std::string queryState()
   {
-    std::string rc=this->curlQuery((char*) _url.c_str());
+    std::string rc=fsmwebCaller::curlQuery((char*) _url.c_str());
     
     Json::Reader reader;
     Json::Value jc;

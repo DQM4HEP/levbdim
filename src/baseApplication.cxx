@@ -3,9 +3,10 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
+#include "fsmwebCaller.hh"
 using namespace levbdim;
 std::string wget(std::string url);
-baseApplication::baseApplication(std::string name)
+baseApplication::baseApplication(std::string name) : _login("")
 {
   
   _fsm=new fsmweb(name);
@@ -54,6 +55,12 @@ baseApplication::baseApplication(std::string name)
 void  baseApplication::create(levbdim::fsmmessage* m)
 {
   Json::Value jc=m->content();
+  if (jc.isMember("login"))
+    {
+      _login=jc["login"].asString();
+    }
+  else
+    _login=std::string("");
   if (jc.isMember("file"))
   {
     std::string fileName=jc["file"].asString();
@@ -70,10 +77,17 @@ void  baseApplication::create(levbdim::fsmmessage* m)
       std::string url=jc["url"].asString();
       std::cout<<url<<std::endl;
       std::cout<<"Hostname "<<_hostname<<std::endl;
-      std::string jsconf=wget(url);
+      //std::string jsconf=wget(url);
+
+      std::string jsconf=fsmwebCaller::curlQuery(url,_login);
       std::cout<<jsconf<<std::endl;
       Json::Reader reader;
-      bool parsingSuccessful = reader.parse(jsconf, _jConfig);
+      Json::Value jcc;
+      bool parsingSuccessful = reader.parse(jsconf,jcc);
+      if (jcc.isMember("content"))
+	_jConfig=jcc["content"];
+      else
+	_jConfig=jcc;
       
       
     }

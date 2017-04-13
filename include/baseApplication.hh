@@ -22,10 +22,12 @@ public:
 protected:
   fsmweb* _fsm;
   std::string _hostname;
+  std::string _login;
   std::string _processName;
   Json::Value _jConfig;
   Json::Value _jParam;
   uint32_t _instance,_port;
+  
 };
 };
 #endif

@@ -71,6 +71,7 @@ private:
   std::string        m_hostname;         ///< The host name on which the job control is running
   uint32_t m_port;
   PidToProcessMap    m_processMap;       ///< The handled process map
+  std::string _login;
 };
 
 

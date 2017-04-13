@@ -1,4 +1,5 @@
 #include "fsmjob.hh"
+#include "fsmwebCaller.hh"
 #include "fileTailer.hh"
 #include <iostream>
 #include <fstream>
@@ -90,7 +91,7 @@ processData::processData(const std::string &jsonString) : m_string(jsonString)
   m_status = NOT_CREATED;
 
 }
-fsmjob::fsmjob(std::string name,uint32_t port)  : m_port(port)
+fsmjob::fsmjob(std::string name,uint32_t port)  : m_port(port),_login("")
 {
   _fsm=new fsmweb(name);
 
@@ -165,6 +166,12 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
   // Parse the json message
   // {"command": "CONFIGURE", "content": {"detid": 100, "sourceid": [23, 24, 26]}}
   Json::Value jc=m->content();
+   if (jc.isMember("login"))
+    {
+      _login=jc["login"].asString();
+    }
+  else
+    _login=std::string("");
   if (jc.isMember("file"))
     {
       std::string fileName=jc["file"].asString();
@@ -186,10 +193,24 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
 	std::string url=jc["url"].asString();
 	std::cout<<url<<std::endl;
     std::cout<<"Hostname "<<m_hostname<<std::endl;
+    /*
 	std::string jsconf=wget(url);
 	std::cout<<jsconf<<std::endl;
 	Json::Reader reader;
 	bool parsingSuccessful = reader.parse(jsconf, m_jfile);
+    */
+
+	std::string jsconf=fsmwebCaller::curlQuery(url,_login);
+	std::cout<<jsconf<<std::endl;
+	Json::Reader reader;
+	Json::Value jcc;
+	bool parsingSuccessful = reader.parse(jsconf,jcc);
+	if (jcc.isMember("content"))
+	  m_jfile=jcc["content"];
+	else
+	  m_jfile=jcc;
+
+
 	
 	if (parsingSuccessful)
 	  {

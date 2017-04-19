@@ -114,6 +114,7 @@ FSMMongo::FSMMongo(std::string name,fsmweb* f) : _name(name), _fsm(f)
 
 void FSMMongo::fsmProcess(Request &request, JsonResponse &response)
 {
+    response.setHeader("Access-Control-Allow-Origin","*");
    std::cout<<"fsmProcess"<<request.getUrl()<<" "<<request.getMethod()<<" "<<request.getData()<<std::endl;
   // Get the command and content
   Json::Value v; v.clear();
@@ -149,16 +150,19 @@ void FSMMongo::fsmProcess(Request &request, JsonResponse &response)
 }
 void FSMMongo::cmdProcess(Request &request, JsonResponse &response)
 {
+  response.setHeader("Access-Control-Allow-Origin","*");
   _fsm->handleRequest(request,response);
 }
 
 void FSMMongo::List(Request &request, JsonResponse &response)
 {
+
   response["PREFIX"]=_name;
   response["FSM"]=_fsm->transitionsList();
   response["CMD"]=_fsm->commandsList();
   response["STATE"]=_fsm->state();
   response["PID"]=getpid();
+  response.setHeader("Access-Control-Allow-Origin","*");
 }
 
 void FSMMongo::setup()

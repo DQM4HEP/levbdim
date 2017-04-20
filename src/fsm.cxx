@@ -174,3 +174,22 @@ Json::Value fsm::transitionsList()
     }
   return jrep;
 }
+Json::Value fsm::allowList()
+{
+  Json::Value jrep;jrep.clear();
+  for( std::map<std::string,std::vector<levbdim::fsmTransition> >::iterator it=_transitions.begin();it!=_transitions.end();it++)
+    {
+      bool allowed=false;
+      std::vector<levbdim::fsmTransition> &vp=it->second;
+      for (std::vector<levbdim::fsmTransition>::iterator ift=vp.begin();ift!=vp.end();ift++)
+	if (ift->initialState().compare(_state)==0)
+	  {allowed=true;break;}
+      if (allowed)
+	{
+	  Json::Value jc;
+	  jc["name"]=it->first;
+	  jrep.append(jc);
+	}
+    }
+  return jrep;
+}

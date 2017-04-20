@@ -66,6 +66,7 @@ namespace levbdim {
     std::string state();
     void publishState();
     Json::Value transitionsList();
+    Json::Value allowList();
   private:
     std::vector<std::string> _states;
     std::string _state;

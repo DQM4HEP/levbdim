@@ -159,6 +159,7 @@ void FSMMongo::List(Request &request, JsonResponse &response)
 
   response["PREFIX"]=_name;
   response["FSM"]=_fsm->transitionsList();
+  response["ALLOWED"]=_fsm->allowList();
   response["CMD"]=_fsm->commandsList();
   response["STATE"]=_fsm->state();
   response["PID"]=getpid();

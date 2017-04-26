@@ -64,6 +64,7 @@ protected:
   void startProcess(levbdim::processData* pd);
   void killProcess(uint32_t pid,uint32_t sig=9);
   Json::Value jsonStatus();
+  void buildJobConfig();
 private:
   fsmweb* _fsm;
   typedef std::map<pid_t,levbdim::processData*> PidToProcessMap;

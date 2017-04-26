@@ -47,6 +47,9 @@ baseApplication::baseApplication(std::string name) : _login("")
  
   char* wp=getenv("WEBPORT");
   if (wp!=NULL) _port=atoi(wp);
+
+  char* wl=getenv("WEBLOGIN");
+  if (wl!=NULL) _login=std::string(wl);
   
   _jConfig=Json::Value::null;
   _jParam=Json::Value::null;
@@ -54,13 +57,15 @@ baseApplication::baseApplication(std::string name) : _login("")
 
 void  baseApplication::create(levbdim::fsmmessage* m)
 {
+
   Json::Value jc=m->content();
   if (jc.isMember("login"))
     {
       _login=jc["login"].asString();
     }
-  else
-    _login=std::string("");
+  std::cout<<"WEB LOGIN is "<<_login<<std::endl<<std::flush;
+  // else
+  //   _login=std::string("");
   if (jc.isMember("file"))
   {
     std::string fileName=jc["file"].asString();

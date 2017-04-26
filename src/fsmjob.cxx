@@ -7,6 +7,68 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+
+#include <stdio.h>
+#include <errno.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+#include <vector>
+#include <string>
+#include <iostream>
+using namespace std;
+bool checkIP(std::string host)
+{  int i;
+    struct hostent *he;
+    struct hostent *hlocal;
+    struct in_addr **addr_list;
+    struct in_addr **addr_local;
+
+    vector<string> localips;
+    vector<string> hostips;
+    
+    
+    if ((he = gethostbyname(host.c_str())) == NULL) {  // get the host info
+        herror("gethostbyname");
+        return false;
+    }
+    addr_list = (struct in_addr **)he->h_addr_list;
+    for(i = 0; addr_list[i] != NULL; i++) {
+      //printf("%s ", inet_ntoa(*addr_list[i]));
+      hostips.push_back(std::string(inet_ntoa(*addr_list[i])));
+    }
+    
+    // print information about this host:
+    //printf("Official name is: %s\n", he->h_name);
+    char domain[1024];
+    int len=1024;
+    gethostname(domain,len);
+    // printf("Official PC name is: %s\n", domain);
+    hlocal = gethostbyname(domain);
+    //printf("    IP addresses: ");
+    addr_list = (struct in_addr **)hlocal->h_addr_list;
+    for(i = 0; addr_list[i] != NULL; i++) {
+      //printf("%s ", inet_ntoa(*addr_list[i]));
+	localips.push_back(std::string(inet_ntoa(*addr_list[i])));
+    }
+    //printf("\n");
+
+    for (auto hi:hostips)
+      for (auto hl:localips)
+	if (hi.compare(hl)==0)
+	  {//printf(" found \n");
+	    return true;}
+    return false;
+}
+
+
+
+
+
 std::string wget(std::string url);
 
 using namespace levbdim;
@@ -131,6 +193,9 @@ fsmjob::fsmjob(std::string name,uint32_t port)  : m_port(port),_login("")
       s0<<"fsmjob-"<<name;
       DimServer::start(s0.str().c_str());
     }
+
+  char* wl=getenv("WEBLOGIN");
+  if (wl!=NULL) _login=std::string(wl);
   _fsm->start(port);
 }
 
@@ -149,6 +214,16 @@ void fsmjob::endregistration(levbdim::fsmmessage* m)
   std::cout<<"Received "<<m->value()<<std::endl;
 
   m->setAnswer(m_jconf);
+}
+
+void fsmjob::buildJobConfig()
+{
+  for (auto x:m_jfile["HOSTS"].getMemberNames())
+    if (checkIP(x))
+      {
+	 m_jconf=m_jfile["HOSTS"][x];
+	 return;
+      }
 }
 
 void fsmjob::initialise(levbdim::fsmmessage* m)
@@ -170,8 +245,9 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
     {
       _login=jc["login"].asString();
     }
-  else
-    _login=std::string("");
+  // else
+  //   _login=std::string("");
+   std::cout<<"WEB LOGIN is "<<_login<<std::endl<<std::flush;
   if (jc.isMember("file"))
     {
       std::string fileName=jc["file"].asString();
@@ -182,7 +258,8 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
       
       if (parsingSuccessful)
 	{
-	  m_jconf=m_jfile["HOSTS"][m_hostname];
+	  this->buildJobConfig();
+	  //m_jconf=m_jfile["HOSTS"][m_hostname];
 	  Json::StyledWriter styledWriter;
 	  std::cout << styledWriter.write(m_jconf) << std::endl;
 	}
@@ -214,7 +291,8 @@ void fsmjob::initialise(levbdim::fsmmessage* m)
 	
 	if (parsingSuccessful)
 	  {
-	    m_jconf=m_jfile["HOSTS"][m_hostname];
+	    //m_jconf=m_jfile["HOSTS"][m_hostname];
+	    this->buildJobConfig();
 	    Json::StyledWriter styledWriter;
 	    std::cout << styledWriter.write(m_jconf) << std::endl;
 	  }

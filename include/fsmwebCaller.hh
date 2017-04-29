@@ -23,6 +23,7 @@ public:
  
 
   std::string queryState();
+  Json::Value queryWebStatus();
   static std::string curlQuery(std::string url,std::string login=std::string(""));
   std::string sendTransition(std::string name,Json::Value cnt=Json::Value::null);
   std::string sendCommand(std::string name,std::string params=std::string(""));

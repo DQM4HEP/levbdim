@@ -94,7 +94,17 @@ std::string fsmwebCaller::queryState()
     return jc["STATE"].asString();
    
   }
-  
+Json::Value fsmwebCaller::queryWebStatus()
+  {
+    std::string rc=fsmwebCaller::curlQuery((char*) _url.c_str());
+    
+    Json::Reader reader;
+    Json::Value jc;
+    _parseOk = reader.parse( rc, jc);
+    if (!_parseOk) return Json::Value::null;
+    return jc;
+   
+  }
  std::string fsmwebCaller::curlQuery(std::string url,std::string login)
   {
     CURL *curl;

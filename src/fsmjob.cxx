@@ -184,6 +184,22 @@ fsmjob::fsmjob(std::string name,uint32_t port)  : m_port(port),_login("")
   //_fsm->addCommand("REGISTERJOB",boost::bind(&fsmjob::registerjob, this,_1,_2));
   _fsm->addCommand("REGISTERFILE",boost::bind(&fsmjob::registerfile, this,_1,_2));
 
+
+  // parse if any the configuration file
+  std::string line;
+  std::ifstream myfile ("/etc/ljc.conf");
+  _envConf.clear();
+  if (myfile.is_open())
+  {
+    while ( getline (myfile,line) )
+    {
+      std::cout << line << '\n';
+      _envConf.push_back(line);
+    }
+    myfile.close();
+  }
+
+  else cout << "Unable to open /etc/ljc.conf file"; 
   //Start server
   char* dns=getenv("DIM_DNS_NODE");
   if (dns!=NULL)
@@ -372,6 +388,13 @@ void fsmjob::startProcess(levbdim::processData* pProcessData)
   i = 0;
 
   // Fills environment list
+  for (std::vector<std::string>::const_iterator iter = _envConf.begin(), endIter = _envConf.end() ;
+       endIter != iter ; ++iter)
+    {
+      sprintf( envp[i], "%s", (*iter).c_str());
+      pEnvp[i] = & envp[i][0];
+      i++;
+    }
   for (std::vector<std::string>::const_iterator iter = environmentVars.begin(), endIter = environmentVars.end() ;
        endIter != iter ; ++iter)
     {

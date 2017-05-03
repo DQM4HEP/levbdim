@@ -73,6 +73,7 @@ private:
   uint32_t m_port;
   PidToProcessMap    m_processMap;       ///< The handled process map
   std::string _login;
+  std::vector<std::string> _envConf;
 };
 
 

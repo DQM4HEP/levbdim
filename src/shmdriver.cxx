@@ -176,6 +176,31 @@ void shmdriver::processEvent(uint32_t idx)
 
   
 }
+void shmdriver::cleanBufferMap(double lastTime,double delay)
+{
+  std::vector<std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator > vr;
+  for (std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
+    {
+      if (it->second.size()==numberOfDataSource()) continue;
+      if ((lastTime-(*it->second.begin())->bxId()*2E-7)>delay)
+	{
+	  printf("cleaning event at time %f Last write %f nds %d \n",
+		 (*it->second.begin())->bxId()*2E-7,lastTime, it->second.size());
+	  vr.push_back(it);
+	}
+    }
+  
+  // remove completed events
+  for ( std::vector<std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator >::iterator itt=vr.begin();itt!=vr.end();itt++)
+    {
+      std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator &it=(*itt);
+      for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
+      it->second.clear();
+      _eventMap.erase(it);
+    }
+  
+}
+
 void shmdriver::processRunHeader()
 {
   for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
@@ -246,6 +271,7 @@ void shmdriver::scanMemory()
       levbdim::shmdriver::ls(_memdir,vnames);
       if (vnames.size()==0) {::sleep(1);continue;}
       //continue;
+      double twrite=0;
       for ( std::vector<std::string>::iterator it=vnames.begin();it!=vnames.end();it++)
 	{
 	  levbdim::buffer* b=new levbdim::buffer(0x80000);
@@ -269,11 +295,19 @@ void shmdriver::scanMemory()
 	  if (it_gtc->second.size()==this->numberOfDataSource())
 	    {
 	      //if (it_gtc->first%100==0)
-	      printf("GTC %lu %lu  %d\n",it_gtc->first,it_gtc->second.size(),this->numberOfDataSource());
+	      std::vector<levbdim::buffer*>::iterator itb=it_gtc->second.begin();
+	      twrite=(*itb)->bxId()*2E-7;
+	      if (it_gtc->first%256==0)
+		printf("GTC %lu %lu  %lu\n",it_gtc->first,it_gtc->second.size(),(*itb)->bxId());
+	      
 	      this->processEvent(idx_storage);
 	    }
 	}
-      usleep(50000);	
+      
+      // Now clean
+      if (twrite!=0)
+	this->cleanBufferMap(twrite,10);
+      usleep(5000);	
 
     }
 }

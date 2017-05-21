@@ -42,7 +42,9 @@ namespace levbdim {
     uint32_t numberOfDataSource();
     uint32_t numberOfDataSource(uint32_t k);
     
-    
+  
+    void cleanBufferMap(double lastTime,double delay);
+
     void start(uint32_t nr);
     void scanMemory();
     void processEvents();

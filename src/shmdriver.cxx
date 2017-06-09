@@ -253,7 +253,9 @@ void shmdriver::start(uint32_t nr)
   std::cout<<"run : "<<_run<<" SHMDRIVER START for "<<numberOfDataSource()<<" sources"<<std::endl;
   for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
     {
+      std::cout<<"starting processor"<<std::endl;
       (*itp)->start(nr);
+      std::cout<<"starting processor done"<<std::endl;
     }
 
   _running=true;

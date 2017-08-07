@@ -12,9 +12,9 @@
 #include <boost/bind.hpp>
 
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
-#define dskey(d,s) ( (s&0xFFF) | ((d &0x1F)<<12))
+#define dskey(d,s) ( (s&0xFFF) | ((d &0xFFF)<<12))
 #define source_id(k) (k&0xFFF)
-#define detector_id(k) ((k>>12)&0x1F)
+#define detector_id(k) ((k>>12)&0xFFF)
 namespace levbdim {
   class shmprocessor
   {
@@ -22,6 +22,7 @@ namespace levbdim {
     virtual void start(uint32_t run)=0;
     virtual void stop()=0;
     virtual  void processEvent(uint32_t key,std::vector<levbdim::buffer*> dss)=0;
+    virtual  void processRunHeader(std::vector<uint32_t> header)=0;
   };
 
   class shmdriver 
@@ -33,6 +34,7 @@ namespace levbdim {
     void cleanShm();
     void clear();
     void createDirectories();
+    void registerProcessor(std::string name);
     void registerProcessor(levbdim::shmprocessor* p);
     void unregisterProcessor(levbdim::shmprocessor* p);
     void registerDataSource(uint32_t det,uint32_t ds);
@@ -40,11 +42,15 @@ namespace levbdim {
     uint32_t numberOfDataSource();
     uint32_t numberOfDataSource(uint32_t k);
     
-    
+  
+    void cleanBufferMap(double lastTime,double delay);
+
     void start(uint32_t nr);
     void scanMemory();
     void processEvents();
     void processEvent(uint32_t id);
+    void processRunHeader();
+    std::vector<uint32_t>& runHeader(){return _runHeader;}
     void stop();
     
     static void purgeShm(std::string memdir);
@@ -69,6 +75,7 @@ namespace levbdim {
     boost::thread_group _gThread;
     bool _running;
     uint32_t _run,_evt;
+    std::vector<uint32_t> _runHeader;
   };
 }
 #endif

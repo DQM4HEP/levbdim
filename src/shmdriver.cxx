@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 
 
 #include "shmdriver.hh"
@@ -98,6 +99,27 @@ void shmdriver::registerProcessor(levbdim::shmprocessor* p)
 {
   _processors.push_back(p);
 }
+
+void  shmdriver::registerProcessor(std::string name)
+{
+  std::stringstream s;
+  s<<"lib"<<name<<".so";
+  void* library = dlopen(s.str().c_str(), RTLD_NOW);
+
+  printf("%s %x \n",dlerror(),library);
+    // Get the loadFilter function, for loading objects
+  levbdim::shmprocessor* (*create)();
+  create = (levbdim::shmprocessor* (*)())dlsym(library, "loadProcessor");
+  printf("%s %x \n",dlerror(),create);
+  printf("%s lods to %x \n",s.str().c_str(),create); 
+  //void (*destroy)(Filter*);
+  // destroy = (void (*)(Filter*))dlsym(library, "deleteFilter");
+    // Get a new filter object
+  levbdim::shmprocessor* a=(levbdim::shmprocessor*) create();
+  _processors.push_back(a);
+}
+
+
 void shmdriver::unregisterProcessor(levbdim::shmprocessor* p)
 {
   std::vector<levbdim::shmprocessor*>::iterator it=std::find(_processors.begin(),_processors.end(),p);
@@ -106,10 +128,13 @@ void shmdriver::unregisterProcessor(levbdim::shmprocessor* p)
 }
 void shmdriver::registerDataSource(uint32_t det,uint32_t ds)
 {
+  std::cout<<" Registering "<<det<<" "<<ds<<" size "<<_datasources.size()<<" key "<<std::hex<<dskey(det,ds)<<std::dec<<std::endl;
   _datasources.push_back(dskey(det,ds));
 }
 void shmdriver::unregisterDataSource(uint32_t det,uint32_t ds)
 {
+  std::cout<<" UnRegistering "<<det<<" "<<ds<<" size "<<_datasources.size()<<" key "<<std::hex<<dskey(det,ds)<<std::dec<<std::endl;
+
   std::vector<uint32_t>::iterator it=std::find(_datasources.begin(),_datasources.end(),ds);
   if (it!=_datasources.end())
     _datasources.erase(it);
@@ -136,7 +161,7 @@ void shmdriver::processEvent(uint32_t idx)
   if (it->second.size()!=numberOfDataSource()) return;
   if (it->first==0) return; // do not process event 0
   _evt=it->first;
-  std::cout<<"full  event find " <<it->first<<std::endl;
+  //std::cout<<"full  event find " <<it->first<<std::endl;
   for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
     {
       (*itp)->processEvent(it->first,it->second);
@@ -150,7 +175,38 @@ void shmdriver::processEvent(uint32_t idx)
 
   
 }
+void shmdriver::cleanBufferMap(double lastTime,double delay)
+{
+  std::vector<std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator > vr;
+  for (std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
+    {
+      if (it->second.size()==numberOfDataSource()) continue;
+      if ((lastTime-(*it->second.begin())->bxId()*2E-7)>delay)
+	{
+	  printf("cleaning event at time %f Last write %f nds %d \n",
+		 (*it->second.begin())->bxId()*2E-7,lastTime, it->second.size());
+	  vr.push_back(it);
+	}
+    }
+  
+  // remove completed events
+  for ( std::vector<std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator >::iterator itt=vr.begin();itt!=vr.end();itt++)
+    {
+      std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator &it=(*itt);
+      for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
+      it->second.clear();
+      _eventMap.erase(it);
+    }
+  
+}
 
+void shmdriver::processRunHeader()
+{
+  for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
+    {
+      (*itp)->processRunHeader(_runHeader);
+    }
+}
 void shmdriver::processEvents()
 {
   while (_running)
@@ -193,9 +249,12 @@ void shmdriver::start(uint32_t nr)
   // Do the start of the the processors
   _run=nr;
   _evt=0;
+  std::cout<<"run : "<<_run<<" SHMDRIVER START for "<<numberOfDataSource()<<" sources"<<std::endl;
   for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
     {
+      std::cout<<"starting processor"<<std::endl;
       (*itp)->start(nr);
+      std::cout<<"starting processor done"<<std::endl;
     }
 
   _running=true;
@@ -213,6 +272,7 @@ void shmdriver::scanMemory()
       levbdim::shmdriver::ls(_memdir,vnames);
       if (vnames.size()==0) {::sleep(1);continue;}
       //continue;
+      double twrite=0;
       for ( std::vector<std::string>::iterator it=vnames.begin();it!=vnames.end();it++)
 	{
 	  levbdim::buffer* b=new levbdim::buffer(0x80000);
@@ -235,12 +295,20 @@ void shmdriver::scanMemory()
 	    }
 	  if (it_gtc->second.size()==this->numberOfDataSource())
 	    {
-	      if (it_gtc->first%100==0)
-		printf("GTC %lu %lu  %d\n",it_gtc->first,it_gtc->second.size(),this->numberOfDataSource());
+	      //if (it_gtc->first%100==0)
+	      std::vector<levbdim::buffer*>::iterator itb=it_gtc->second.begin();
+	      twrite=(*itb)->bxId()*2E-7;
+	      if (it_gtc->first%256==0)
+		printf("GTC %lu %lu  %lu\n",it_gtc->first,it_gtc->second.size(),(*itb)->bxId());
+	      
 	      this->processEvent(idx_storage);
 	    }
 	}
-      usleep(50000);	
+      
+      // Now clean
+      if (twrite!=0)
+	this->cleanBufferMap(twrite,10);
+      usleep(5000);	
 
     }
 }

@@ -21,6 +21,10 @@ Json::Value fsmmessage::content()
 {
 	return _jsroot["content"];
 }
+Json::Value fsmmessage::status()
+{
+	return _jsroot["status"];
+}
 void fsmmessage::setValue(std::string s)
 {
   _sroot=s;

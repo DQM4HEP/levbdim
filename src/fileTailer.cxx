@@ -11,7 +11,7 @@ fileTailer::fileTailer(uint32_t mb) : _MAXBUFF(mb){}
  * buffer can continue its storage at the beginning of the buffer. This makes
  * the best use of a fixed-sized buffer for long input. */
 
-int fileTailer::fileTail(FILE* s,char *lines[][2], int nlines, char buff[], int maxbuff)
+void fileTailer::fileTail(FILE* s,char *lines[][2], int nlines, char buff[], int maxbuff)
 {
   char *buffp, *linestart;
   int i, c, wrap, nfound;
@@ -61,7 +61,7 @@ int fileTailer::fileTail(FILE* s,char *lines[][2], int nlines, char buff[], int 
 }
 
 
-int fileTailer::findTail(char *lines[][2], int nlines, char buff[], int maxbuff)
+void fileTailer::findTail(char *lines[][2], int nlines, char buff[], int maxbuff)
 {
   char *buffp, *linestart;
   int i, c, wrap, nfound;

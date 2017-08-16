@@ -49,7 +49,7 @@ namespace levbdim {
     levbdim::buffer* _buffer;
     uint32_t _detid,_sourceid;
     std::string _name;
-    int32_t _fdOut;
+    // int32_t _fdOut;
   };
 }
 #endif

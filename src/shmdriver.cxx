@@ -31,7 +31,7 @@ int file_select_2(const struct direct *entry)
     return (1);
 }  
 using namespace levbdim;
-shmdriver::shmdriver(std::string memdir, bool useevent) : _memdir(memdir),_useEventId(useevent),_running(false)
+shmdriver::shmdriver(std::string memdir, bool useevent) : _memdir(memdir),_useEventId(useevent),_running(false),_run(0),_evt(0)
 {
   _eventMap.clear();
   _processors.clear();
@@ -437,6 +437,7 @@ void shmdriver::store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t
   if (ier!=size) 
     {
       std::cout<<"pb in write "<<ier<<std::endl;
+      ::close(fd);
       return;
     }
   ::close(fd);

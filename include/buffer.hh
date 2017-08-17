@@ -46,7 +46,7 @@ namespace levbdim {
      */
     ~buffer() { if (_allocate)
 	{
-	  delete _ptr;}
+	  delete [] _ptr;}
     }
     /**
        \brief Set the detector id

@@ -282,6 +282,18 @@ void shmdriver::scanMemory()
       if (vnames.size()==0) {::sleep(1);continue;}
       //continue;
       double twrite=0;
+
+      if (vnames.size()%this->numberOfDataSource()!=0)
+	    {
+	      std::cout << "\n  ***ERROR - [shmdriver::scanMemory()] - Mismatching data sources found in '" <<  _memdir << "' : " << vnames.size() << " and defined in configFile : " << this->numberOfDataSource() << "\n\t[shmdriver::scanMemory()] - Check number of data sources defined in configuration file \n" << std::endl;  
+
+        for (auto it=vnames.begin();it!=vnames.end();it++)
+	        std::cout<< "vnames : " << *(it) << std::endl;
+
+        cleanShm();
+	      continue;
+	     }
+      
       for ( std::vector<std::string>::iterator it=vnames.begin();it!=vnames.end();it++)
 	{
 	  levbdim::buffer* b=new levbdim::buffer(0x80000);

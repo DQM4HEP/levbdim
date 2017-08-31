@@ -158,10 +158,14 @@ uint32_t shmdriver::numberOfDataSource(uint32_t k)
 void shmdriver::processEvent(uint32_t idx)
 {
   std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.find(idx);
-  if (it->second.size()!=numberOfDataSource()) return;
-  if (it->first==0) return; // do not process event 0
+  if (it->second.size()!=numberOfDataSource())
+    {
+      std::cout<< "[levbdim::processEvent] : wrong number of dataSource" << std::endl;
+      return;
+    }
+    if (it->first==0) return; // do not process event 0
   _evt=it->first;
-  //std::cout<<"full  event find " <<it->first<<std::endl;
+  std::cout<< " [shmdriver::processEvent] - Proccessing event " << it->first << std::endl;
   for (std::vector<levbdim::shmprocessor*>::iterator itp=_processors.begin();itp!=_processors.end();itp++)
     {
       (*itp)->processEvent(it->first,it->second);
@@ -215,7 +219,11 @@ void shmdriver::processEvents()
       //	std::cout<<"Map size "<<_eventMap.size()<<std::endl;
       for ( std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();it++)
 	{
-	  if (it->second.size()!=numberOfDataSource()) continue;
+	  if (it->second.size()!=numberOfDataSource())
+	    {
+	      std::cout<< "[levbdim processEvents] : wrong number of dataSource" << std::endl;
+	      continue;
+	    }
 	  if (it->first==0) continue; // do not process event 0
 	  _evt=it->first;
 	  //std::cout<<"full  event find " <<it->first<<std::endl;
@@ -266,6 +274,7 @@ void shmdriver::scanMemory()
 {
   //levbdim::buffer* b=new levbdim::buffer(0x80000);
   std::vector<std::string> vnames;
+  uint64_t prev_idx_storage = 0;
   while (_running)
     {
       
@@ -285,6 +294,9 @@ void shmdriver::scanMemory()
 	    it_gtc->second.push_back(b);
 	  else
 	    {
+	      if (idx_storage == prev_idx_storage)
+		std::cout << " On en a GROOOS! " <<std::endl;
+	      
 	      std::vector<levbdim::buffer*> v;
 	      v.clear();
 	      v.push_back(b);
@@ -301,6 +313,7 @@ void shmdriver::scanMemory()
 	      if (it_gtc->first%256==0)
 		printf("GTC %lu %lu  %lu\n",it_gtc->first,it_gtc->second.size(),(*itb)->bxId());
 	      
+	      prev_idx_storage = idx_storage;
 	      this->processEvent(idx_storage);
 	    }
 	}
@@ -429,8 +442,9 @@ void shmdriver::store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t
     {
    
       //LOG4CXX_FATAL(_logShm," Cannot open shm file "<<s.str());
+      std::cout<< " Cannot open shm file "<<name<<std::endl;
       perror("No way to store to file :");
-      //std::cout<<" No way to store to file"<<std::endl;
+      std::cout<<" No way to store to file"<<std::endl;
       return;
     }
   int ier=write(fd,ptr,size);

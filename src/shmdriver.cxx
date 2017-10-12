@@ -9,11 +9,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <sys/dir.h>  
-#include <sys/param.h>  
-#include <stdio.h>  
-#include <stdlib.h>  
-#include <unistd.h>  
+#include <sys/dir.h>
+#include <sys/param.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <stdint.h>
 #include <fcntl.h>
@@ -21,15 +21,15 @@
 #include <sstream>
 #include "datasource.hh"
 #include "datasocket.hh"
-extern  int alphasort(); //Inbuilt sorting function  
+extern  int alphasort(); //Inbuilt sorting function
 
-int file_select_2(const struct direct *entry)  
-{  
-  if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0))  
+int file_select_2(const struct direct *entry)
+{
+  if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0))
     return (0);
-  else  
+  else
     return (1);
-}  
+}
 using namespace levbdim;
 shmdriver::shmdriver(std::string memdir, bool useevent) : _memdir(memdir),_useEventId(useevent),_running(false),_run(0),_evt(0)
 {
@@ -57,33 +57,33 @@ void shmdriver::cleanShm()
 }
 void shmdriver::purgeShm(std::string memory_dir)
 {
-  int count,i;  
+  int count,i;
   struct direct **files;
   std::stringstream sc;
   sc.str(std::string());
   sc<<memory_dir<<"/closed/";
-  
-  count = scandir(sc.str().c_str(), &files, file_select_2, alphasort);  
-	
-  /* If no files found, make a non-selectable menu item */  
+
+  count = scandir(sc.str().c_str(), &files, file_select_2, alphasort);
+
+  /* If no files found, make a non-selectable menu item */
   for (i=1; i<count+1; ++i)
     {
       //uint32_t dtc,gtc,dif;
       //unsigned long long abcid;
       //sscanf(files[i-1]->d_name,"%lld_%d_%d_%d",&abcid,&dtc,&gtc,&dif);
       //printf("dif %d DTC %d GTC %d \n",dif,dtc,gtc);
-		
+
       char fname[256];
       memset(fname,0,256);
       sprintf(fname,"%s/%s",memory_dir.c_str(),files[i-1]->d_name);
       unlink(fname);
-      
+
       memset(fname,0,256);
       sprintf(fname,"%s/%s",sc.str().c_str(),files[i-1]->d_name);
       unlink(fname);
       free(files[i-1]);
     }
-	
+
 }
 
 void shmdriver::createDirectories()
@@ -108,10 +108,16 @@ void  shmdriver::registerProcessor(std::string name)
 
   printf("%s %x \n",dlerror(),library);
     // Get the loadFilter function, for loading objects
+
+  #pragma GCC diagnostic push    //Save actual diagnostics state
+  #pragma GCC diagnostic ignored "-Wpedantic"    //Disable pedantic
+  // Get the loadFilter function, for loading objects
   levbdim::shmprocessor* (*create)();
   create = (levbdim::shmprocessor* (*)())dlsym(library, "loadProcessor");
+  #pragma GCC diagnostic pop    //Restore diagnostics state
+
   printf("%s %x \n",dlerror(),create);
-  printf("%s lods to %x \n",s.str().c_str(),create); 
+  printf("%s lods to %x \n",s.str().c_str(),create);
   //void (*destroy)(Filter*);
   // destroy = (void (*)(Filter*))dlsym(library, "deleteFilter");
     // Get a new filter object
@@ -171,13 +177,13 @@ void shmdriver::processEvent(uint32_t idx)
       (*itp)->processEvent(it->first,it->second);
     }
 
-  
+
   // remove completed events
   for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
   it->second.clear();
   _eventMap.erase(it);
 
-  
+
 }
 void shmdriver::cleanBufferMap(double lastTime,double delay)
 {
@@ -192,7 +198,7 @@ void shmdriver::cleanBufferMap(double lastTime,double delay)
 	  vr.push_back(it);
 	}
     }
-  
+
   // remove completed events
   for ( std::vector<std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator >::iterator itt=vr.begin();itt!=vr.end();itt++)
     {
@@ -201,7 +207,7 @@ void shmdriver::cleanBufferMap(double lastTime,double delay)
       it->second.clear();
       _eventMap.erase(it);
     }
-  
+
 }
 
 void shmdriver::processRunHeader()
@@ -231,15 +237,15 @@ void shmdriver::processEvents()
 	    {
 	      (*itp)->processEvent(it->first,it->second);
 	    }
-  
+
 	}
       // remove completed events
       for (std::map<uint64_t,std::vector<levbdim::buffer*> >::iterator it=_eventMap.begin();it!=_eventMap.end();)
 	{
-	  
+
 	  if (it->second.size()==numberOfDataSource())
 	    {
-	      //std::cout<<"Deleting Event "<<it->first<<std::endl; 
+	      //std::cout<<"Deleting Event "<<it->first<<std::endl;
 	      for (std::vector<levbdim::buffer*>::iterator iv=it->second.begin();iv!=it->second.end();iv++) delete (*iv);
 	      it->second.clear();
 	      _eventMap.erase(it++);
@@ -249,9 +255,9 @@ void shmdriver::processEvents()
 	}
       ::usleep(500);
     }
-  
+
 }
-    
+
 void shmdriver::start(uint32_t nr)
 {
   // Do the start of the the processors
@@ -277,7 +283,7 @@ void shmdriver::scanMemory()
   uint64_t prev_idx_storage = 0;
   while (_running)
     {
-      
+
       levbdim::shmdriver::ls(_memdir,vnames);
       if (vnames.size()==0) {::sleep(1);continue;}
       //continue;
@@ -285,7 +291,7 @@ void shmdriver::scanMemory()
 
       if (vnames.size()%this->numberOfDataSource()!=0)
 	    {
-	      std::cout << "\n  ***ERROR - [shmdriver::scanMemory()] - Mismatching data sources found in '" <<  _memdir << "' : " << vnames.size() << " and defined in configFile : " << this->numberOfDataSource() << "\n\t[shmdriver::scanMemory()] - Check number of data sources defined in configuration file \n" << std::endl;  
+	      std::cout << "\n  ***ERROR - [shmdriver::scanMemory()] - Mismatching data sources found in '" <<  _memdir << "' : " << vnames.size() << " and defined in configFile : " << this->numberOfDataSource() << "\n\t[shmdriver::scanMemory()] - Check number of data sources defined in configuration file \n" << std::endl;
 
         for (auto it=vnames.begin();it!=vnames.end();it++)
 	        std::cout<< "vnames : " << *(it) << std::endl;
@@ -293,7 +299,7 @@ void shmdriver::scanMemory()
         cleanShm();
 	      continue;
 	     }
-      
+
       for ( std::vector<std::string>::iterator it=vnames.begin();it!=vnames.end();it++)
 	{
 	  levbdim::buffer* b=new levbdim::buffer(0x80000);
@@ -308,11 +314,11 @@ void shmdriver::scanMemory()
 	    {
 	      if (idx_storage == prev_idx_storage)
 		std::cout << " On en a GROOOS! " <<std::endl;
-	      
+
 	      std::vector<levbdim::buffer*> v;
 	      v.clear();
 	      v.push_back(b);
-          
+
 	      std::pair<uint64_t,std::vector<levbdim::buffer*> > p(idx_storage,v);
 	      _eventMap.insert(p);
 	      it_gtc=_eventMap.find(idx_storage);
@@ -324,16 +330,16 @@ void shmdriver::scanMemory()
 	      twrite=(*itb)->bxId()*2E-7;
 	      if (it_gtc->first%256==0)
 		printf("GTC %lu %lu  %lu\n",it_gtc->first,it_gtc->second.size(),(*itb)->bxId());
-	      
+
 	      prev_idx_storage = idx_storage;
 	      this->processEvent(idx_storage);
 	    }
 	}
-      
+
       // Now clean
       if (twrite!=0)
 	this->cleanBufferMap(twrite,10);
-      usleep(5000);	
+      usleep(5000);
 
     }
 }
@@ -349,7 +355,7 @@ void shmdriver::stop()
     }
 
 }
-    
+
 std::string shmdriver::name(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t bxid)
 {
   std::stringstream s;
@@ -386,27 +392,27 @@ uint64_t shmdriver::bxId(std::string name)
 }
 void shmdriver::ls(std::string sourcedir,std::vector<std::string>& res)
 {
- 
+
   res.clear();
-  int count,i;  
-  struct direct **files;  
+  int count,i;
+  struct direct **files;
   std::stringstream sc;
   sc.str(std::string());
   sc<<sourcedir<<"/closed/";
-  
-  count = scandir(sc.str().c_str(), &files, file_select_2, alphasort); 		
-  /* If no files found, make a non-selectable menu item */  
+
+  count = scandir(sc.str().c_str(), &files, file_select_2, alphasort);
+  /* If no files found, make a non-selectable menu item */
   if(count <= 0)    {return ;}
-       
-  std::stringstream sd;		
-  //printf("Number of files = %d\n",count);  
-  for (i=1; i<count+1; ++i)  
+
+  std::stringstream sd;
+  //printf("Number of files = %d\n",count);
+  for (i=1; i<count+1; ++i)
     {
       // file name
       std::string fName;
       fName.assign(files[i-1]->d_name);
       res.push_back(fName);
-       
+
       /* sc.str(std::string());
        sd.str(std::string());
        sc<<sourcedir<<"/closed/"<<files[i-1]->d_name;
@@ -428,7 +434,7 @@ void shmdriver::pull(std::string name,levbdim::buffer* buf,std::string sourcedir
   sc<<sourcedir<<"/closed/"<<name;
   sd<<sourcedir<<"/"<<name;
   int fd=::open(sd.str().c_str(),O_RDONLY);
-  if (fd<0) 
+  if (fd<0)
     {
       printf("%s  Cannot open file %s : return code %d \n",__PRETTY_FUNCTION__,sd.str().c_str(),fd);
       //LOG4CXX_FATAL(_logShm," Cannot open shm file "<<fname);
@@ -452,7 +458,7 @@ void shmdriver::store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t
   int fd= ::open(name,O_CREAT| O_RDWR | O_NONBLOCK,S_IRWXU);
   if (fd<0)
     {
-   
+
       //LOG4CXX_FATAL(_logShm," Cannot open shm file "<<s.str());
       std::cout<< " Cannot open shm file "<<name<<std::endl;
       perror("No way to store to file :");
@@ -460,7 +466,7 @@ void shmdriver::store(uint32_t detid,uint32_t sourceid,uint32_t eventid,uint64_t
       return;
     }
   int ier=write(fd,ptr,size);
-  if (ier!=size) 
+  if (ier!=size)
     {
       std::cout<<"pb in write "<<ier<<std::endl;
       ::close(fd);

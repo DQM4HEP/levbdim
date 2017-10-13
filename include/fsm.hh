@@ -59,12 +59,14 @@ namespace levbdim {
   public:
 
     fsm(std::string name);
-    std::string processCommand(levbdim::fsmmessage* msg);
+    virtual std::string processCommand(levbdim::fsmmessage* msg);
     void addState(std::string statename);
     void addTransition(std::string cmd,std::string istate,std::string fstate,PFunctor f);
     void setState(std::string s);
     std::string state();
     void publishState();
+    Json::Value transitionsList();
+    Json::Value allowList();
   private:
     std::vector<std::string> _states;
     std::string _state;

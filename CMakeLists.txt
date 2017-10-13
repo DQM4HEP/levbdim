@@ -30,6 +30,7 @@ FIND_PACKAGE( Threads REQUIRED )
 FIND_PACKAGE( DIM REQUIRED SHARED )   # for networking
 FIND_PACKAGE( JSONCPP REQUIRED )      # io support
 FIND_PACKAGE( ZLIB REQUIRED )         # buffer compression
+
 FIND_PACKAGE( Boost COMPONENTS system thread REQUIRED  ) # generic support libraries
 
 FOREACH( pkg DIM JSONCPP ZLIB Boost )
@@ -58,8 +59,11 @@ ADD_DEFINITIONS("-Wno-long-long -Wreturn-type -Werror")
 
 FILE( GLOB
     SRC_FILES
-    src/*.cxx
-)
+    src/basicwriter.cxx
+    src/datasocket.cxx
+    src/datasource.cxx
+    src/shmdriver.cxx
+    )
 
 ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${SRC_FILES} )
 

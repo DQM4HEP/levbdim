@@ -42,8 +42,15 @@ def SWIGSharedLibrary(env, library, sources, **args):
 Decider('MD5-timestamp')
 XDAQ_ROOT="/opt/xdaq"
 DHCAL_ROOT=os.path.abspath("..")
-Use_Dim=True
-#os.environ.has_key("DIM_DNS_NODE")
+try:
+  DIM_ROOT=os.environ["DIMDIR"]
+  Use_Dim=True
+except:
+  Use_Dim=False
+if (not Use_Dim):
+  print "Please set DIMDIR"
+  exit(0)
+  #os.environ.has_key("DIM_DNS_NODE")
 fres=os.popen('uname -r')
 kl=fres.readline().split(".")
 
@@ -73,20 +80,27 @@ else:
   boostthread='boost_thread-mt'
   
 # includes
-INCLUDES=['include',"/usr/include/boost141/","/usr/include/jsoncpp"]
+INCLUDES=['include',"/usr/include/boost141/","/usr/include/jsoncpp","/usr/local/include","/usr/local/include/mongoose"]
 
 
 INCLUDES.append(commands.getoutput("python -c 'import distutils.sysconfig as conf; print conf.get_python_inc()'"))
 
-CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "-DXERCES=2", "-DDAQ_VERSION_2"]
+CPPFLAGS=["-DLINUX", "-DREENTRANT" ,"-Dlinux", "-DLITTLE_ENDIAN__ ", "-Dx86",  "-DXERCES=2", "-DDAQ_VERSION_2","-std=c++11"]
 
+if  Arm:
+  INCLUDES.append("/opt/mongo/include") 
+INCLUDES.append("/opt/mongo/include") 
 #Library ROOT + some of XDAQ + DB 
 
 
 
-LIBRARIES=['pthread',  'm', 'stdc++','log4cxx','jsoncpp','z',boostsystem,boostthread]
+LIBRARIES=['pthread',  'm','dl', 'stdc++','jsoncpp','z','mongoose','curl',"boost_filesystem","mongoclient","ssl",boostsystem,boostthread]
 
-
+if  Arm:
+  LIBRARIES.append("boost_regex")
+  LIBRARIES.append("rt")
+LIBRARIES.append("boost_regex")
+LIBRARIES.append("rt")
 
 #Library path XDAQ,DHCAL and ROOT + Python
 if (Bit64):
@@ -95,15 +109,21 @@ else:
   LIBRARY_PATHS=["/usr/lib","/usr/local/lib","/usr/lib/boost141"]
 LIBRARY_PATHS.append(commands.getoutput("python -c 'import distutils.sysconfig as conf; print conf.PREFIX'")+"/lib")
 
+if  Arm:
+  LIBRARY_PATHS.append("/opt/mongo/lib")
+
+LIBRARY_PATHS.append("/opt/mongo/lib")
+
 
 if Use_Dim:
    CPPFLAGS.append("-DUSE_DIM")
-   INCLUDES.append("/opt/dhcal/dim/dim")
+   INCLUDES.append(DIM_ROOT+"/dim")
    LIBRARIES.append("dim")
-   LIBRARY_PATHS.append("/opt/dhcal/dim/linux")
+   LIBRARY_PATHS.append(DIM_ROOT+"/linux")
 
 
 #link flags
+#LDFLAGS=["-fPIC","-dynamiclib"]
 LDFLAGS=["-fPIC","-dynamiclib"]
 
 
@@ -143,6 +163,11 @@ EXE_LIBPATH=LIBRARY_PATHS
 EXE_LIBPATH.append("#lib")
 EXE_LIBS=LIBRARIES
 EXE_LIBS.append("levbdim")
+
+
+plugbase=env.SharedLibrary("lib/basicwriter",source="src/basicwriter.cc",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
+EXE_LIBS.append("basicwriter")
 dums=env.Program("bin/dummyS",source="test/dummyServer.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
 dumb=env.Program("bin/dummyB",source="test/dummyBuilder.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)
+ljcb=env.Program("bin/ljc",source="test/ljc.cxx",LIBPATH=EXE_LIBPATH,LIBS=EXE_LIBS)	
 
